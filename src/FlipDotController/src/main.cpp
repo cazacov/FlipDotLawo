@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "flipDotLib.h"
+#include "flipDot34SyncLib.h"
 
 void setup() {
   // put your setup code here, to run once:
@@ -13,7 +13,7 @@ bool state = false;
 void loop() {
 
   for (int y = 0; y < 19; y++) {
-    for (int x = 0; x < 28; x++) {
+    for (int x = 0; x < 56; x++) {
       setDot(x, y, state);    
     }
   }

@@ -1,4 +1,4 @@
-#include "flipDotLib.h"
+#include "flipDot34SyncLib.h"
 #include "Arduino.h"
 #include "TimerOne.h"
 
@@ -7,7 +7,8 @@
 #define dataPin 10
 #define clockPin 11
 
-#define enablePin 2
+#define enableFirstPin 2
+#define enablePinCount 6
 
 // Address jumpers
 #define addr0pin 8
@@ -29,14 +30,12 @@
 #define enableOnBit 1 << 10
 #define enableOffBit 1 << 9
 
-#define BUFFER_SIZE 532
+#define pulseLengthMicroseconds 300
+#define pauseLengthMicroseconds 300
 
 // Library variables
 int fd_width_;
 int fd_height_;
-volatile uint16_t buffer_[BUFFER_SIZE];
-volatile size_t head_;
-volatile size_t tail_;
 
 // forward decalrations
 void setEnable(uint8_t mask);
@@ -47,7 +46,9 @@ void onTimer(void);
 void init(int width, int height) {
     fd_width_ = width;
     fd_height_ = height;
-    pinMode(enablePin, OUTPUT);
+    for (uint8_t pin = enableFirstPin; pin < enableFirstPin + enablePinCount; pin++) {
+        pinMode(pin, OUTPUT);
+    }
     pinMode(addr0pin, INPUT_PULLUP);
     pinMode(addr1pin, INPUT_PULLUP);
     pinMode(addr2pin, INPUT_PULLUP);
@@ -56,9 +57,6 @@ void init(int width, int height) {
     pinMode(clockPin, OUTPUT);
     setEnable(0);
     sendZeros();
-//    Timer1.initialize(500);
-    //Timer1.attachInterrupt(onTimer);
-    tail_ = head_ = 0;
 }
 
 uint8_t addressMap[] = {
@@ -91,54 +89,17 @@ uint16_t calculateBits(int x, int y, bool state) {
 
 void setDot(int x, int y, bool state) {
 
+    uint8_t matrix = x / fd_width_;
+    x %= fd_width_;
+
     uint16_t data = calculateBits(x, y, state);
     sendData(data);
-    setEnable(1);
-//    Serial.println(data, HEX);
-    delayMicroseconds(300);
+    setEnable(1 << matrix);
+    delayMicroseconds(pulseLengthMicroseconds);
     setEnable(0);
     sendZeros();
-    delayMicroseconds(300);
+    delayMicroseconds(pauseLengthMicroseconds);
 }
-
-
-/*    
-    if (tail_ + BUFFER_SIZE == head_ + BUFFER_SIZE + 1) {
-        tail_++;
-        tail_ %= BUFFER_SIZE;
-    }
-    buffer_[head_++] = result;
-    head_ %= BUFFER_SIZE;
-*/
-
-/*
-
-volatile bool timerFlip = false;
-bool yDriverOn = false;
-
-void onTimer(void)
-{
-    
-  if (timerFlip) {
-    if (head_ != tail_) {
-        uint16_t data = buffer_[tail_];
-        sendData(data);
-        yDriverOn = true;
-        setEnable(1);
-        tail_++;
-        tail_ %= BUFFER_SIZE;
-    } else {
-        if (yDriverOn) {
-            sendZeros();
-            yDriverOn = false;
-        }
-    }
-  } else {
-      setEnable(0);
-  }
-  timerFlip = !timerFlip;
-}
-*/
 
 void setEnable(uint8_t mask) {
     mask <<= 2;

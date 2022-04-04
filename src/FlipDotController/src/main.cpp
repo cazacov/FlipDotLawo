@@ -2,10 +2,9 @@
 #include "flipDot34SyncLib.h"
 
 void setup() {
-  // put your setup code here, to run once:
-  init(28, 19);
+  // 2 columns of matrices, each 28x19 dots
+  FlipDot32Sync.init(28, 19, 2);
   Serial.begin(115200);
-  setDot(5,5, true);
 }
 
 bool state = false;
@@ -14,7 +13,7 @@ void loop() {
 
   for (int y = 0; y < 19; y++) {
     for (int x = 0; x < 56; x++) {
-      setDot(x, y, state);    
+      FlipDot32Sync.setDot(x, y, state);    
     }
   }
   delay(3000);

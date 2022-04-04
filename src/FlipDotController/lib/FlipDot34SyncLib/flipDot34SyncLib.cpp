@@ -1,6 +1,5 @@
 #include "flipDot34SyncLib.h"
 #include "Arduino.h"
-#include "TimerOne.h"
 
 // 595 shift register
 #define latchPin 9
@@ -30,22 +29,17 @@
 #define enableOnBit 1 << 10
 #define enableOffBit 1 << 9
 
-#define pulseLengthMicroseconds 300
-#define pauseLengthMicroseconds 300
+#define pulseLengthMicroseconds 200
+#define pauseLengthMicroseconds 10
 
-// Library variables
-int fd_width_;
-int fd_height_;
+FlipDot32Sync_ FlipDot32Sync;
 
-// forward decalrations
-void setEnable(uint8_t mask);
-void sendZeros();
-void sendData(uint16_t data);
-void onTimer(void);
-
-void init(int width, int height) {
-    fd_width_ = width;
-    fd_height_ = height;
+void FlipDot32Sync_::init(int matrix_width, int matrix_height, int matrix_columns) {
+    matrix_width_ = matrix_width;
+    matrix_height_ = matrix_height;
+    matrix_columns_ = matrix_columns;
+    display_width_ = matrix_width * matrix_columns;
+    display_height_ = matrix_height;
     for (uint8_t pin = enableFirstPin; pin < enableFirstPin + enablePinCount; pin++) {
         pinMode(pin, OUTPUT);
     }
@@ -59,14 +53,7 @@ void init(int width, int height) {
     sendZeros();
 }
 
-uint8_t addressMap[] = {
-    1, 2, 3, 4, 5, 6, 7,
-    9, 10, 11, 12, 13, 14, 15,
-    17, 18, 19, 20, 21, 22, 23,
-    25, 26, 27, 28, 29, 30, 31,
-};
-
-uint16_t calculateBits(int x, int y, bool state) {
+uint16_t FlipDot32Sync_::calculateBits(uint8_t x, uint8_t y, bool state) {
     x = addressMap[x];
     y = addressMap[y];
 
@@ -87,27 +74,37 @@ uint16_t calculateBits(int x, int y, bool state) {
     return result;
 }
 
-void setDot(int x, int y, bool state) {
-
-    uint8_t matrix = x / fd_width_;
-    x %= fd_width_;
-
+void FlipDot32Sync_::setDot(int x, int y, bool state) {
+   
+    if (x >= display_width_) {
+        return;
+    }
+    if (y >= display_height_) {
+        return;
+    }
+    
+    uint8_t matrix_column = 0;
+    while (x >= matrix_width_) {
+        x -= matrix_width_;
+        matrix_column++;
+    }
+    
     uint16_t data = calculateBits(x, y, state);
     sendData(data);
-    setEnable(1 << matrix);
+    setEnable(1 << matrix_column);
     delayMicroseconds(pulseLengthMicroseconds);
     setEnable(0);
     sendZeros();
     delayMicroseconds(pauseLengthMicroseconds);
 }
 
-void setEnable(uint8_t mask) {
+void FlipDot32Sync_::setEnable(uint8_t mask) {
     mask <<= 2;
     PORTD |= mask;
     PORTD &= (mask + 3);
 }
 
-void sendZeros() {
+void FlipDot32Sync_::sendZeros() {
     digitalWrite(latchPin, LOW);
     for (int i = 0; i < 16; i++) {
         bitClear(PORTB, clockPinPORTB); //clockOff();
@@ -117,7 +114,7 @@ void sendZeros() {
     digitalWrite(latchPin, HIGH);
 }
 
-void sendData(uint16_t data) {
+void FlipDot32Sync_::sendData(uint16_t data) {
   digitalWrite(latchPin, LOW);
 
   for (int i = 0; i < 16; i++)  {

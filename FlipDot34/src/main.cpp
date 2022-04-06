@@ -7,25 +7,127 @@ FlipDot34GFX display(28, 19, 1, StackMode::kStacked);
 void setup() {
   // 2 columns of matrices, each 28x19 dots
   Serial.begin(115200);
-
-
   display.setRotation(3);
-  display.fillScreen(0);
-  display.setTextColor(1,0);
-  display.setCursor(1, 1);
-  display.print("Hi");
-  delay(5000);
 }
 
-bool state = false;
+int sprite_x = 0;
+int sprite_y = 0;
+int sprite_dx = 1;
+int sprite_dy = 1;
+int sprite_width = 15;
+int sprite_height = 15;
+
 
 void loop() {
+  sprite_x += sprite_dx;
+  sprite_y += sprite_dy;
 
-  for (int y = 0; y < 8; y++) {
-    for (int x = 0; x < 12; x++) {
-      display.setDot(x, y, state);    
-    }
+  if (sprite_x == 0 || sprite_x + sprite_width >= display.width()) {
+    sprite_dx = -sprite_dx;
   }
+
+  if (sprite_y == 0 || sprite_y+ sprite_height >= display.height()) {
+    sprite_dy = -sprite_dy;
+  }
+
+  int x0 = sprite_x;
+  int y0 = sprite_y;
+
+  display.startWrite();
+  display.fillScreen(1); 
+  display.drawPixel(x0, y0+5, false);  
+  display.drawPixel(x0, y0+6, false);
+  display.drawPixel(x0, y0+7, false);
+  display.drawPixel(x0, y0+8, false);  
+  display.drawPixel(x0, y0+9, false);  
+
+  display.drawPixel(x0+1, y0+3, false);  
+  display.drawPixel(x0+1, y0+4, false);
+  display.drawPixel(x0+1, y0+5, false);
+  display.drawPixel(x0+1, y0+10, false);  
+  display.drawPixel(x0+1, y0+11, false);  
+
+  display.drawPixel(x0+2, y0+2, false);  
+  display.drawPixel(x0+2, y0+5, false);
+  display.drawPixel(x0+2, y0+6, false);
+  display.drawPixel(x0+2, y0+7, false);  
+  display.drawPixel(x0+2, y0+12, false);  
+
+  display.drawPixel(x0+3, y0+1, false);  
+  display.drawPixel(x0+3, y0+5, false);
+  display.drawPixel(x0+3, y0+8, false);
+  display.drawPixel(x0+3, y0+13, false);  
+
+  display.drawPixel(x0+4, y0+1, false);  
+  display.drawPixel(x0+4, y0+5, false);
+  display.drawPixel(x0+4, y0+7, false);
+  display.drawPixel(x0+4, y0+8, false);  
+  display.drawPixel(x0+4, y0+13, false);  
+
+  display.drawPixel(x0+5, y0, false);  
+  display.drawPixel(x0+5, y0+5, false);
+  display.drawPixel(x0+5, y0+6, false);
+  display.drawPixel(x0+5, y0+7, false);  
+  display.drawPixel(x0+5, y0+8, false);    
+  display.drawPixel(x0+5, y0+14, false);  
+
+  display.drawPixel(x0+6, y0, false);  
+  display.drawPixel(x0+6, y0+5, false);
+  display.drawPixel(x0+6, y0+6, false);
+  display.drawPixel(x0+6, y0+7, false);  
+  display.drawPixel(x0+6, y0+11, false);    
+  display.drawPixel(x0+6, y0+14, false);    
+
+  display.drawPixel(x0+7, y0, false);  
+  display.drawPixel(x0+7, y0+5, false);
+  display.drawPixel(x0+7, y0+6, false);
+  display.drawPixel(x0+7, y0+11, false);    
+  display.drawPixel(x0+7, y0+14, false);    
+
+  display.drawPixel(x0+8, y0, false);  
+  display.drawPixel(x0+8, y0+5, false);
+  display.drawPixel(x0+8, y0+6, false);
+  display.drawPixel(x0+8, y0+7, false);  
+  display.drawPixel(x0+8, y0+11, false);    
+  display.drawPixel(x0+8, y0+14, false);    
+
+  display.drawPixel(x0+9, y0, false);  
+  display.drawPixel(x0+9, y0+5, false);
+  display.drawPixel(x0+9, y0+8, false);
+  display.drawPixel(x0+9, y0+11, false);    
+  display.drawPixel(x0+9, y0+14, false);    
+
+  display.drawPixel(x0+10, y0+1, false);  
+  display.drawPixel(x0+10, y0+5, false);
+  display.drawPixel(x0+10, y0+7, false);  
+  display.drawPixel(x0+10, y0+8, false);
+  display.drawPixel(x0+10, y0+10, false);    
+  display.drawPixel(x0+10, y0+13, false);    
+
+  display.drawPixel(x0+11, y0+1, false);  
+  display.drawPixel(x0+11, y0+5, false);
+  display.drawPixel(x0+11, y0+6, false);  
+  display.drawPixel(x0+11, y0+7, false);  
+  display.drawPixel(x0+11, y0+8, false);
+  display.drawPixel(x0+11, y0+13, false);    
+
+  display.drawPixel(x0+12, y0+2, false);  
+  display.drawPixel(x0+12, y0+5, false);
+  display.drawPixel(x0+12, y0+6, false);  
+  display.drawPixel(x0+12, y0+7, false);  
+  display.drawPixel(x0+12, y0+12, false);    
+
+  display.drawPixel(x0+13, y0+3, false);  
+  display.drawPixel(x0+13, y0+4, false);
+  display.drawPixel(x0+13, y0+5, false);  
+  display.drawPixel(x0+13, y0+10, false);  
+  display.drawPixel(x0+13, y0+11, false);    
+
+  display.drawPixel(x0+14, y0+5, false);  
+  display.drawPixel(x0+14, y0+6, false);
+  display.drawPixel(x0+14, y0+7, false);  
+  display.drawPixel(x0+14, y0+8, false);  
+  display.drawPixel(x0+14, y0+9, false);  
+  display.endWrite();
   delay(3000);
-  state = !state;
 }

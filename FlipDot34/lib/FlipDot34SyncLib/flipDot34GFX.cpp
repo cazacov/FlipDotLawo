@@ -30,10 +30,10 @@
 #define enableOffBit 1 << 9
 
 #define pulseLengthMicroseconds 200
-#define pauseLengthMicroseconds 20
+#define pauseLengthMicroseconds 100
 
 FlipDot34GFX::FlipDot34GFX(int matrix_width, int matrix_height, int matrix_columns, StackMode stack_mode)
-    : Adafruit_GFX(matrix_width * matrix_columns, stack_mode == StackMode::kRow ? matrix_height : matrix_height * 2)
+    : GFXcanvas1(matrix_width * matrix_columns, stack_mode == StackMode::kRow ? matrix_height : matrix_height * 2)
  {
     is_stacked_ = stack_mode == StackMode::kStacked;
 
@@ -42,6 +42,10 @@ FlipDot34GFX::FlipDot34GFX(int matrix_width, int matrix_height, int matrix_colum
     matrix_columns_ = matrix_columns;
     display_width_ = matrix_width * matrix_columns;
     display_height_ = matrix_height;
+    frameBufferWidth = (WIDTH + 7) >> 3;
+    frameBufferSize = frameBufferWidth * HEIGHT;
+    frameBuffer = (uint8_t*) malloc(frameBufferSize);
+    memset(frameBuffer, 0, frameBufferSize);
     for (uint8_t pin = enableFirstPin; pin < enableFirstPin + enablePinCount; pin++) {
         pinMode(pin, OUTPUT);
     }
@@ -53,6 +57,8 @@ FlipDot34GFX::FlipDot34GFX(int matrix_width, int matrix_height, int matrix_colum
     pinMode(clockPin, OUTPUT);
     setEnable(0);
     sendZeros();
+
+    clearScreen();
 }
 
 uint16_t FlipDot34GFX::calculateBits(uint8_t x, uint8_t y, bool state) {
@@ -89,26 +95,8 @@ uint16_t FlipDot34GFX::calculateBits(uint8_t x, uint8_t y, bool state) {
 
 void FlipDot34GFX::setDot(int x, int y, bool state) {
    
-if ((x < 0) || (y < 0) || (x >= _width) || (y >= _height))
+    if ((x < 0) || (y < 0) || (x >= WIDTH) || (y >= HEIGHT))
       return;
-
-    int16_t t;
-    switch (rotation) {
-    case 1:
-      t = x;
-      x = WIDTH - 1 - y;
-      y = t;
-      break;
-    case 2:
-      x = WIDTH - 1 - x;
-      y = HEIGHT - 1 - y;
-      break;
-    case 3:
-      t = x;
-      x = y;
-      y = HEIGHT - 1 - t;
-      break;
-    }
     
     uint8_t matrix_column = 0;
     while (x >= matrix_width_) {
@@ -170,7 +158,46 @@ void FlipDot34GFX::sendData(uint16_t data) {
   digitalWrite(latchPin, HIGH);
 }
 
+void FlipDot34GFX::clearScreen() {
+    for (int16_t y = 0; y < HEIGHT; y++) {
+        for (int16_t x = 0; x < WIDTH; x++) {
+            setDot(x,y,false);
+        }
+    }
+}
+
 // overwrites Adafruit
-void FlipDot34GFX::drawPixel(int16_t x, int16_t y, uint16_t color) {
-    setDot(x, y, (color > 0));
+void FlipDot34GFX::endWrite(void) {
+
+    uint8_t* buf_ptr = frameBuffer;
+    uint8_t* canvas_ptr = getBuffer();
+
+    Serial.print("Framebuffer width:");
+    Serial.println(frameBufferWidth);
+
+
+    for(int16_t y = 0; y < HEIGHT; y++) {
+        uint8_t mask = 0x80;   
+        uint8_t buf_val = *buf_ptr;
+        uint8_t canvas_val = *canvas_ptr;
+        for(int16_t x = 0; x < WIDTH; x++) {
+            if ((buf_val ^ canvas_val) & mask) {
+                setDot(x, y, canvas_val & mask);
+            }
+            mask >>= 1;
+            if (!mask) {
+                mask = 0x80;
+                buf_ptr++;
+                canvas_ptr++;
+                buf_val = *buf_ptr;
+                canvas_val = *canvas_ptr;
+            }
+        }
+        if (WIDTH & 0x07) {
+            buf_ptr++;
+            canvas_ptr++;
+        }    
+    }
+    //store previous frame Buffer
+    memcpy(frameBuffer, getBuffer(), frameBufferSize);
 }

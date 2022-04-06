@@ -1,4 +1,4 @@
-#include "flipDot34SyncLib.h"
+#include "FlipDot34GFX.h"
 #include "Arduino.h"
 
 // 595 shift register
@@ -30,11 +30,13 @@
 #define enableOffBit 1 << 9
 
 #define pulseLengthMicroseconds 200
-#define pauseLengthMicroseconds 10
+#define pauseLengthMicroseconds 20
 
-FlipDot32Sync_ FlipDot32Sync;
+FlipDot34GFX::FlipDot34GFX(int matrix_width, int matrix_height, int matrix_columns, StackMode stack_mode)
+    : Adafruit_GFX(matrix_width * matrix_columns, stack_mode == StackMode::kRow ? matrix_height : matrix_height * 2)
+ {
+    is_stacked_ = stack_mode == StackMode::kStacked;
 
-void FlipDot32Sync_::init(int matrix_width, int matrix_height, int matrix_columns) {
     matrix_width_ = matrix_width;
     matrix_height_ = matrix_height;
     matrix_columns_ = matrix_columns;
@@ -53,9 +55,20 @@ void FlipDot32Sync_::init(int matrix_width, int matrix_height, int matrix_column
     sendZeros();
 }
 
-uint16_t FlipDot32Sync_::calculateBits(uint8_t x, uint8_t y, bool state) {
+uint16_t FlipDot34GFX::calculateBits(uint8_t x, uint8_t y, bool state) {
     x = addressMap[x];
-    y = addressMap[y];
+
+    if (!is_stacked_) {
+        y = addressMap[y];
+    }
+    else {
+        if (y < matrix_height_) {
+            y = addressMap[matrix_height_ - y - 1];
+        }
+        else {
+            y = addressMap[y - matrix_height_];
+        }
+    }
 
     uint16_t result = x;
     result <<= 11;
@@ -74,19 +87,43 @@ uint16_t FlipDot32Sync_::calculateBits(uint8_t x, uint8_t y, bool state) {
     return result;
 }
 
-void FlipDot32Sync_::setDot(int x, int y, bool state) {
+void FlipDot34GFX::setDot(int x, int y, bool state) {
    
-    if (x >= display_width_) {
-        return;
-    }
-    if (y >= display_height_) {
-        return;
+if ((x < 0) || (y < 0) || (x >= _width) || (y >= _height))
+      return;
+
+    int16_t t;
+    switch (rotation) {
+    case 1:
+      t = x;
+      x = WIDTH - 1 - y;
+      y = t;
+      break;
+    case 2:
+      x = WIDTH - 1 - x;
+      y = HEIGHT - 1 - y;
+      break;
+    case 3:
+      t = x;
+      x = y;
+      y = HEIGHT - 1 - t;
+      break;
     }
     
     uint8_t matrix_column = 0;
     while (x >= matrix_width_) {
         x -= matrix_width_;
         matrix_column++;
+    }
+    if (is_stacked_) {
+        if (y < matrix_height_) {
+            matrix_column <<= 1;
+            matrix_column++;
+            x = matrix_width_ - x - 1;
+        }
+        else {
+            matrix_column <<= 1;
+        }
     }
     
     uint16_t data = calculateBits(x, y, state);
@@ -98,13 +135,13 @@ void FlipDot32Sync_::setDot(int x, int y, bool state) {
     delayMicroseconds(pauseLengthMicroseconds);
 }
 
-void FlipDot32Sync_::setEnable(uint8_t mask) {
+void FlipDot34GFX::setEnable(uint8_t mask) {
     mask <<= 2;
     PORTD |= mask;
     PORTD &= (mask + 3);
 }
 
-void FlipDot32Sync_::sendZeros() {
+void FlipDot34GFX::sendZeros() {
     digitalWrite(latchPin, LOW);
     for (int i = 0; i < 16; i++) {
         bitClear(PORTB, clockPinPORTB); //clockOff();
@@ -114,7 +151,7 @@ void FlipDot32Sync_::sendZeros() {
     digitalWrite(latchPin, HIGH);
 }
 
-void FlipDot32Sync_::sendData(uint16_t data) {
+void FlipDot34GFX::sendData(uint16_t data) {
   digitalWrite(latchPin, LOW);
 
   for (int i = 0; i < 16; i++)  {
@@ -131,4 +168,9 @@ void FlipDot32Sync_::sendData(uint16_t data) {
     bitSet(PORTB, clockPinPORTB); //clockOn();
   }
   digitalWrite(latchPin, HIGH);
+}
+
+// overwrites Adafruit
+void FlipDot34GFX::drawPixel(int16_t x, int16_t y, uint16_t color) {
+    setDot(x, y, (color > 0));
 }

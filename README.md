@@ -2,6 +2,10 @@
 
 Controller for the flip-dot display with 34-pin connector. For example produced by Lawo-Luminator-Europa Mark IV Industries GmbH.
 
+![Prototype](./_img/front.jpg)
+
+![Prototype](./_img/back.jpg)
+
 ## Connector Pinout
 | Pin |  Function | Pin |  Function |
 | --- | ------ | --- | ------ |
@@ -23,13 +27,37 @@ Controller for the flip-dot display with 34-pin connector. For example produced 
 | 31   | GND  | 32   | GND  | 
 | 33   | GND  | 34   | GND  | 
 
-## Controller Prototype 
+![Prototype](./_img/driver-board.jpg)
 
-The prototype uses Arduino Nano and two 74HC595 shift registers to control up to 6 matrices. By adding another 595 it can control up to 8 matrices.
+## Chaining Multiple Displays in a Row
+
+Driver board has two connectors. The output connector ST2 mostly duplicates 1:1 singnals from the input ST1 but ENABLE-X- signals are shifted. 
+
+| Pin | INPUT  ST1 |  OUTPUT ST2 |
+| --- | ---------- | ---------- |
+| 13  | ENABLE-X-1 | ENABLE-X-2 |
+| 15  | ENABLE-X-2 | ENABLE-X-3 |
+| 17  | ENABLE-X-3 | ENABLE-X-4 |
+| 19  | ENABLE-X-4 | ENABLE-X-5 |
+| 21  | ENABLE-X-5 | ENABLE-X-6 |
+| 23  | ENABLE-X-6 | ENABLE-X-7 |
+| 25  | ENABLE-X-7 | ENABLE-X-8 |
+| 17  | ENABLE-X-8 | ENABLE-X-1 |
+
+The ENABLE input of FP2800 X Driver is always connected to ENABLE-X-1 connector pin. For example when ENABLE-X-3 is set to HIGH the first two displays in a row will ignore it, but after two decrements the signal will be applied to ENABLE-X-1 ST1 of the third display matrix and will activate it.
+
+
+![Prototype](./_img/row_front.jpg)
+
+![Prototype](./_img/row_back.jpg)
+
+## Controller Board
+
+### Prototype
+
+The prototype uses Arduino Nano and two 74HC595 shift registers to control up to 6 matrices. By adding another 595 it can control up to 8 display matrices.
 
 ![Prototype](./_img/FlipDot34-prototype.png)
-
-## Display Prototype
 
 
 

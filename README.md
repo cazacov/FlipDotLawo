@@ -13,8 +13,8 @@ Controller for the flip-dot display with 34-pin connector. For example produced 
 | 3   | GND  | 4   | GND  | 
 | 5   | 5V  |  6   | 5V  | 
 | 7   | A0-X | 8 | DATA-X |
-| 9   | A1-X | 10 | ENABLE-Y-ON |
-| 11   | A2-X | 12 | ENABLE-Y-OFF |
+| 9   | A1-X | 10 | ENABLE-Y-SET |
+| 11   | A2-X | 12 | ENABLE-Y-RESET |e
 | 13   | B0-X | 14 | ENABLE-X-1 |
 | 15   | B1-X | 16 | ENABLE-X-2 |
 | 17   | A0-Y | 18 | ENABLE-X-3 |

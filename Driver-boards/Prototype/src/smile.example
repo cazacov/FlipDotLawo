@@ -131,3 +131,30 @@ void loop() {
   display.endWrite();
   delay(3000);
 }
+
+
+/*
+
+FlipDot34GFX display(28, 19, 1, StackMode::kRow);
+
+void setup() {
+  display.startWrite();
+  display.fillScreen(0); 
+  display.setTextColor(1);
+  display.setCursor(1, 8);
+  display.print("28");
+
+  display.setCursor(16, 8);
+  display.print("19");
+  display.drawPixel(13, 11, 1);
+  display.drawPixel(15, 11, 1);
+  display.drawPixel(14, 12, 1);
+  display.drawPixel(13, 13, 1);
+  display.drawPixel(15, 13, 1);
+  display.endWrite();
+}
+
+void loop() {
+  
+}
+*/

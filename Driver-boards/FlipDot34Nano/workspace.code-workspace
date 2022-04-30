@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "BasicTest",
+			"path": "examples\\BasicTest"
+		},
+		{
+			"path": "lib\\FlipDot34Nano"
+		}
+	]
+}

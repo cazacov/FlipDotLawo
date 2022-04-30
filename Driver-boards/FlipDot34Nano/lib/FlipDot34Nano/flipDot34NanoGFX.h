@@ -27,14 +27,11 @@ protected:
     uint8_t* frameBuffer;
     uint16_t frameBufferSize;
     uint16_t frameBufferWidth;
-    uint8_t addressMap[28] = {
-        1, 2, 3, 4, 5, 6, 7,
-        9, 10, 11, 12, 13, 14, 15,
-        17, 18, 19, 20, 21, 22, 23,
-        25, 26, 27, 28, 29, 30, 31,
-    };
-    uint16_t calculateBits(uint8_t x, uint8_t y, bool state);
-    void setEnable(uint8_t mask);
+
+
+//    uint16_t calculateBits(uint8_t x, uint8_t y, bool state);
+//    void setEnable(uint8_t mask);
     void sendZeros();
-    void sendData(uint16_t data);
+    void sendData(uint8_t x, uint8_t y, uint8_t matrix, bool state);
+    void sendDataRaw(uint16_t address, uint8_t enable);
 };

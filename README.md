@@ -27,7 +27,7 @@ Controller for the flip-dot display with 34-pin connector. For example produced 
 | 31   | GND  | 32   | GND  | 
 | 33   | GND  | 34   | GND  | 
 
-![Prototype](./_img/driver-board.jpg)
+![Matrix driver](./_img/driver-board.jpg)
 
 ## Chaining Multiple Displays in a Row
 
@@ -44,6 +44,8 @@ Driver board has two connectors. The output connector ST2 mostly duplicates 1:1 
 | 25  | ENABLE-X-7 | ENABLE-X-8 |
 | 17  | ENABLE-X-8 | ENABLE-X-1 |
 
+![Pinout](./_img/pinout.png)
+
 The ENABLE input of FP2800 X Driver is always connected to ENABLE-X-1 connector pin. For example when ENABLE-X-3 is set to HIGH the first two displays in a row will ignore it, but after two decrements the signal will be applied to ENABLE-X-1 ST1 of the third display matrix and will activate it.
 
 
@@ -51,14 +53,23 @@ The ENABLE input of FP2800 X Driver is always connected to ENABLE-X-1 connector 
 
 ![Prototype](./_img/row_back.jpg)
 
-## Controller Board
+## Driver Boards
 
 ### Prototype
 
-The prototype uses Arduino Nano and two 74HC595 shift registers to control up to 6 matrices. By adding another 595 it can control up to 8 display matrices.
+This prototype uses Arduino Nano and two 74HC595 shift registers to control up to 6 matrices. By adding another 595 it can control up to 8 display matrices.
 
 ![Prototype](./_img/FlipDot34-prototype.png)
 
+### FlipDot34Nano
+
+Driver board with Arduino Nano and three 74HC595 shift registers opitmized for single-sided PCB that can be milled with 3018 CNC. 3 digital pins are used for controlling shift registers, analog pins A4 and A5 can be used to receive commands over I2C. Pins A0-A2 connected to DIP switches choosing I2C address.
+
+![Prototype](./_img/pcb_back.jpg)
+![Prototype](./_img/pcb_front.jpg)
+
+
+Schematic in KiCad 6 format checked in under .\Driver-boards\FlipDot34Nano\schematic\FlipDot34Nano
 
 
 ---

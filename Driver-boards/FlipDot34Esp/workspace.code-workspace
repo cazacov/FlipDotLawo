@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"name": "BasicTest",
+			"path": "examples\\BasicTest"
+		},
+		{
+			"path": "lib"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"xmemory": "cpp"
+		}
+	}
+}

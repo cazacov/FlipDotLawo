@@ -6,11 +6,33 @@
 		},
 		{
 			"path": "lib"
+		},
+		{
+			"name": "StackedDisplays",
+			"path": "examples\\StackedDisplays"
+		},
+		{
+			"name": "I2CFlipDotController",
+			"path": "I2CFlipDotController"
 		}
 	],
 	"settings": {
 		"files.associations": {
-			"xmemory": "cpp"
+			"xmemory": "cpp",
+			"array": "cpp",
+			"deque": "cpp",
+			"initializer_list": "cpp",
+			"list": "cpp",
+			"ranges": "cpp",
+			"span": "cpp",
+			"vector": "cpp",
+			"xhash": "cpp",
+			"xstring": "cpp",
+			"xtree": "cpp",
+			"xutility": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"string_view": "cpp"
 		}
 	}
 }

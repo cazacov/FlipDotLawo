@@ -4,7 +4,7 @@
 #include <Adafruit_GFX.h>
 #include "flipDot34NanoGFX.h"
 
-FlipDot34NanoGFX display(28, 19, 1, StackMode::kStacked);
+FlipDot34NanoGFX display(28, 19, 1, StackMode::kRow);
 
 void setup() {
   Serial.begin(115200);

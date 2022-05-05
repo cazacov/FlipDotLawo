@@ -2,15 +2,14 @@
 #include <SPI.h>
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_GFX.h>
-#include "FlipDot34GFX.h"
+#include "flipDot34NanoGFX.h"
 
-FlipDot34GFX display(28, 19, 1, StackMode::kStacked);
+FlipDot34NanoGFX display(28, 19, 1, StackMode::kStacked);
 
 void setup() {
   // 2 columns of matrices, each 28x19 dots
   Serial.begin(115200);
-  display.setRotation(3);
-
+  display.setRotation(3); // your setup may vary
   display.startWrite();
   display.fillScreen(0); 
   display.endWrite();

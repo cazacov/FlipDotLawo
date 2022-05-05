@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"name": "BasicTest",
+			"path": "examples\\BasicTest"
+		},
+		{
+			"path": "lib\\FlipDot34Nano"
+		},
+		{
+			"path": "examples\\StackedDisplays"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"array": "cpp",
+			"ranges": "cpp",
+			"span": "cpp",
+			"vector": "cpp",
+			"xstring": "cpp",
+			"xutility": "cpp",
+			"string": "cpp",
+			"string_view": "cpp",
+			"xmemory": "cpp"
+		}
+	}
+}

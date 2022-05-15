@@ -68,10 +68,11 @@ void receiveEvent(int howMany)
   while( Wire.available()) // loop through all but the last
   {
     uint8_t next_byte = Wire.read(); // receive byte as a character
+//    Serial.print(next_byte, HEX);         // print the character
+//    Serial.print(" ");
     processor.processByte(next_byte);
-    Serial.print(next_byte, HEX);         // print the character
   }
-  Serial.println();         // print the integer
+//  Serial.println();         // print the integer
 }
 
 void timerCallback() {

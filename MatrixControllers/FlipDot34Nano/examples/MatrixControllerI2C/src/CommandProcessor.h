@@ -12,8 +12,7 @@ enum class GfxCommand {
     kLine = 0x06,
     kRect = 0x07,
     kFillRect = 0x08,
-    kCircle = 0x09,
-    kFillCircle = 0x0A
+    kBitmap = 0x09,
 };
 
 class CommandProcessor {
@@ -23,9 +22,10 @@ private:
     size_t awaiting_bytes;
     size_t offset; 
     GfxCommand command_;
-    uint8_t buffer[80];
+    uint8_t buffer[160];
     void executeCommand();
     bool decodeCommand(uint8_t data);
+    void copyBitmap(uint8_t x0, uint8_t y0, uint8_t w, uint8_t h, uint8_t *bytes);
 
     uint8_t color;
 public:

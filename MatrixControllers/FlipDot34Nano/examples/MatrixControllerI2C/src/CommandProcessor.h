@@ -5,7 +5,15 @@
 enum class GfxCommand {
     kNop = 0x00,
     kClear = 0x01,
-    kFill = 0x02
+    kFill = 0x02,
+    kDotSet = 0x03,
+    kDotReset = 0x04,
+    kSetColor = 0x05,
+    kLine = 0x06,
+    kRect = 0x07,
+    kFillRect = 0x08,
+    kCircle = 0x09,
+    kFillCircle = 0x0A
 };
 
 class CommandProcessor {
@@ -18,6 +26,8 @@ private:
     uint8_t buffer[80];
     void executeCommand();
     bool decodeCommand(uint8_t data);
+
+    uint8_t color;
 public:
     CommandProcessor(Adafruit_GFX* display) : 
         display_(display)
@@ -26,6 +36,7 @@ public:
         is_receiving_ = false;
         awaiting_bytes = 0;
         offset = 0;
+        color = 1;
     }
     void processByte(uint8_t next_byte);
 };

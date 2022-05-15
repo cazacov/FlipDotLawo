@@ -5,8 +5,11 @@
 #include <Adafruit_GFX.h>
 #include "flipDot34NanoGFX.h"
 #include "TimerOne.h"
+#include "CommandProcessor.h"
 
 FlipDot34NanoGFX display(28, 19, 1, StackMode::kRow);
+
+CommandProcessor processor(&display);
 
 const uint8_t STATE_IDLE = 0;
 const uint8_t STATE_PULSE = 1;
@@ -38,17 +41,13 @@ void setup() {
   Wire.begin(address);
   Wire.onReceive(receiveEvent);
   Serial.print("Listening on address: "); 
-  Serial.print(address * 2, HEX);
+  Serial.println(address * 2, HEX);
   delay(2000);
   
-  // test 
-  for (int16_t i = 0; i < display.width(); i++) {
-    display.writeFastVLine(i, 0, display.height(), 1);
-  }
-
   Timer1.initialize();
   Timer1.attachInterrupt(timerCallback);
   Timer1.stop();
+
 }
 
 void loop() {
@@ -68,8 +67,9 @@ void receiveEvent(int howMany)
 {
   while( Wire.available()) // loop through all but the last
   {
-    char c = Wire.read(); // receive byte as a character
-    Serial.print(c, HEX);         // print the character
+    uint8_t next_byte = Wire.read(); // receive byte as a character
+    processor.processByte(next_byte);
+    Serial.print(next_byte, HEX);         // print the character
   }
   Serial.println();         // print the integer
 }

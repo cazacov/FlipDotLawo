@@ -31,26 +31,37 @@ void setup() {
   sprintf(buf, "0x%02X", address * 2);
   display.printCentered(buf, display.width()/2, display.height()/2);
   display.endWrite();
+  
+  pinMode(debugPin, OUTPUT);
+  digitalWrite(debugPin, LOW);
 
   Wire.begin(address);
   Wire.onReceive(receiveEvent);
-  pinMode(debugPin, OUTPUT);
-  digitalWrite(debugPin, LOW);
   Serial.print("Listening on address: "); 
   Serial.print(address * 2, HEX);
+  delay(2000);
+  
+  // test 
+  for (int16_t i = 0; i < display.width(); i++) {
+    display.writeFastVLine(i, 0, display.height(), 1);
+  }
+
   Timer1.initialize();
   Timer1.attachInterrupt(timerCallback);
   Timer1.stop();
 }
 
 void loop() {
-  while (true) {
-    if (state == STATE_IDLE) {
-      digitalWrite(debugPin, HIGH);
-      Timer1.setPeriod(PULSE_MICROSECONDS);
-      state = STATE_PULSE;
-    }
+  if (state != STATE_IDLE) {
+    return;
   }
+
+  while (!display.updateNext()) {
+    ; // do nothing
+  }
+  digitalWrite(debugPin, HIGH);
+  Timer1.setPeriod(PULSE_MICROSECONDS);
+  state = STATE_PULSE;
 }
 
 void receiveEvent(int howMany)
@@ -67,9 +78,10 @@ void timerCallback() {
   Timer1.stop();
 
   if (state == STATE_PULSE) {
+    state = STATE_DELAY;
+    display.endPulse();
     digitalWrite(debugPin, LOW);
     Timer1.setPeriod(DELAY_MICROSECONDS);
-    state = STATE_DELAY;
   } else if (state == STATE_DELAY) {
       state = STATE_IDLE;
   }

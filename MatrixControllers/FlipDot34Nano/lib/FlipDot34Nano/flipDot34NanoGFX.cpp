@@ -52,13 +52,13 @@ uint8_t FlipDot34NanoGFX::readConfig() {
 }
 
 void FlipDot34NanoGFX::setDot(int x, int y, bool state) {
-    setDotStart(x, y, state);
+    startPulse(x, y, state);
     delayMicroseconds(pulseLengthMicroseconds);
-    sendZeros();
+    endPulse();
     delayMicroseconds(pauseLengthMicroseconds);
 }
 
-void FlipDot34NanoGFX::setDotStart(int x, int y, bool state)
+void FlipDot34NanoGFX::startPulse(int x, int y, bool state)
 {
     if ((x < 0) || (y < 0) || (x >= WIDTH) || (y >= HEIGHT))
         return;
@@ -84,6 +84,11 @@ void FlipDot34NanoGFX::setDotStart(int x, int y, bool state)
     }
     sendData(x, y, matrix_column, state);
 }
+
+void FlipDot34NanoGFX::endPulse() {
+    sendZeros();
+}
+
 
 void FlipDot34NanoGFX::sendZeros()
 {
@@ -252,6 +257,11 @@ void FlipDot34NanoGFX::clearScreen()
     }
     memset(frameBuffer, 0, frameBufferSize);
     memset(getBuffer(), 0, frameBufferSize);
+    next_x = 0;
+    next_y = 0;
+    next_mask = 0x80;
+    next_screen_ptr = frameBuffer;
+    next_target_ptr = getBuffer();
 }
 
 // overwrites Adafruit
@@ -292,7 +302,8 @@ void FlipDot34NanoGFX::endWrite(void)
     next_x = 0;
     next_y = 0;
     next_mask = 0x80;
-    next_offset = 0;
+    next_screen_ptr = frameBuffer;
+    next_target_ptr = getBuffer();
 }
 
 void FlipDot34NanoGFX::printCentered(const char *buf, uint16_t x, uint16_t y) {
@@ -307,27 +318,45 @@ void FlipDot34NanoGFX::setBitmap(const uint8_t *bytes, size_t count) {
     memcpy(getBuffer(), bytes, count < frameBufferSize ? count : frameBufferSize);
 }
 
+char bb[100];
+
 bool FlipDot34NanoGFX::updateNext() {
     bool result = false;
 
-    uint8_t current_byte = frameBuffer[next_offset];
-    uint8_t target_byte = getBuffer()[next_offset];
-    if ((current_byte ^ target_byte) & next_mask) {
-        setDotStart(next_x, next_y, target_byte & next_mask);
+    uint8_t screen_byte = *next_screen_ptr;
+    uint8_t target_byte = *next_target_ptr;
+
+//    sprintf(bb, "cb: %d, tb: %d", (int)screen_byte, (int)target_byte);
+//    Serial.println(bb);
+
+    if ((screen_byte ^ target_byte) & next_mask) {
+        startPulse(next_x, next_y, target_byte & next_mask);
+        screen_byte ^= next_mask;  // flip bit
+        *next_screen_ptr = screen_byte; // write modified value back to the frame buffer
         result = true;
     }
     next_mask >>= 1;
     if (next_mask == 0) {
         next_mask = 0x80;
-        next_offset++;
+        next_screen_ptr++;
+        next_target_ptr++;
     }
-    ++next_x; 
+    next_x++; 
     if (next_x >= WIDTH) {
         next_x = 0;
         next_y++; 
+        if (next_mask != 0x80) {
+            next_screen_ptr++;
+            next_target_ptr++;
+            next_mask = 0x80;
+        }
     }
     if (next_y >= HEIGHT) {
+        next_x = 0;
         next_y = 0;
+        next_mask = 0x80;
+        next_screen_ptr = frameBuffer;
+        next_target_ptr = getBuffer();
     }
     return result;
 }

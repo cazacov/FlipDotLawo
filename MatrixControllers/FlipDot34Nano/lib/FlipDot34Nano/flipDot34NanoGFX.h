@@ -18,6 +18,7 @@ public:
     uint8_t readConfig();
     void setBitmap(const uint8_t *bytes, size_t count);
     bool updateNext();
+    void endPulse();
 // Override AdafruitGFX
     void endWrite(void);
 // GFX Helper    
@@ -35,9 +36,10 @@ protected:
     uint8_t next_x;
     uint8_t next_y;
     uint8_t next_mask;
-    uint8_t next_offset;
+    uint8_t *next_screen_ptr;
+    uint8_t *next_target_ptr;
 
-    void setDotStart(int x, int y, bool state);
+    void startPulse(int x, int y, bool state);
     void sendZeros();
     void sendData(uint8_t x, uint8_t y, uint8_t matrix, bool state);
     void sendDataRaw(uint32_t data); 

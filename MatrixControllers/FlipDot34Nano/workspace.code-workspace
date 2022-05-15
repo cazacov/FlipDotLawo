@@ -9,6 +9,10 @@
 		},
 		{
 			"path": "examples\\StackedDisplays"
+		},
+		{
+			"name": "MatrixControllerI2C",
+			"path": "examples\\MatrixControllerI2C"
 		}
 	],
 	"settings": {
@@ -21,7 +25,16 @@
 			"xutility": "cpp",
 			"string": "cpp",
 			"string_view": "cpp",
-			"xmemory": "cpp"
+			"xmemory": "cpp",
+			"iosfwd": "cpp",
+			"set": "cpp",
+			"xlocale": "cpp",
+			"deque": "cpp",
+			"initializer_list": "cpp",
+			"list": "cpp",
+			"xhash": "cpp",
+			"xiosbase": "cpp",
+			"xtree": "cpp"
 		}
 	}
 }

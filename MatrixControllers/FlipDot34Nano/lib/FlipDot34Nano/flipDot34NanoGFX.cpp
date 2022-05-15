@@ -35,10 +35,30 @@ FlipDot34NanoGFX::FlipDot34NanoGFX(int matrix_width, int matrix_height, int matr
     pinMode(dataPin, OUTPUT);
     pinMode(clockPin, OUTPUT);
     sendZeros();
-    clearScreen();
 }
 
-void FlipDot34NanoGFX::setDot(int x, int y, bool state)
+uint8_t FlipDot34NanoGFX::readConfig() {
+    uint8_t result = 0;
+    if (!digitalRead(addr0pin)) {
+        result |= 0x01;
+    }
+    if (!digitalRead(addr1pin)) {
+        result |= 0x02;
+    }
+    if (!digitalRead(addr2pin)) {
+        result |= 0x04;
+    }
+    return result;
+}
+
+void FlipDot34NanoGFX::setDot(int x, int y, bool state) {
+    setDotStart(x, y, state);
+    delayMicroseconds(pulseLengthMicroseconds);
+    sendZeros();
+    delayMicroseconds(pauseLengthMicroseconds);
+}
+
+void FlipDot34NanoGFX::setDotStart(int x, int y, bool state)
 {
     if ((x < 0) || (y < 0) || (x >= WIDTH) || (y >= HEIGHT))
         return;
@@ -62,11 +82,7 @@ void FlipDot34NanoGFX::setDot(int x, int y, bool state)
             y = y - matrix_height_;
         }
     }
-
     sendData(x, y, matrix_column, state);
-    delayMicroseconds(pulseLengthMicroseconds);
-    sendZeros();
-    delayMicroseconds(pauseLengthMicroseconds);
 }
 
 void FlipDot34NanoGFX::sendZeros()
@@ -234,18 +250,13 @@ void FlipDot34NanoGFX::clearScreen()
             setDot(x, y, false);
         }
     }
+    memset(frameBuffer, 0, frameBufferSize);
+    memset(getBuffer(), 0, frameBufferSize);
 }
 
 // overwrites Adafruit
 void FlipDot34NanoGFX::endWrite(void)
 {
-
-#ifdef BOARD_SMD
-    Serial.println("Board type: SMD");
-#else
-    Serial.println("Board type: not SMD");
-#endif // DEBUG
-
     uint8_t *buf_ptr = frameBuffer;
     uint8_t *canvas_ptr = getBuffer();
 
@@ -278,4 +289,45 @@ void FlipDot34NanoGFX::endWrite(void)
     }
     //store previous frame Buffer
     memcpy(frameBuffer, getBuffer(), frameBufferSize);
+    next_x = 0;
+    next_y = 0;
+    next_mask = 0x80;
+    next_offset = 0;
+}
+
+void FlipDot34NanoGFX::printCentered(const char *buf, uint16_t x, uint16_t y) {
+    int16_t x1, y1;
+    uint16_t w, h;
+    getTextBounds(buf, 0, 0, &x1, &y1, &w, &h);
+    setCursor(x - w / 2, y - h/2);
+    print(buf);
+}
+
+void FlipDot34NanoGFX::setBitmap(const uint8_t *bytes, size_t count) {
+    memcpy(getBuffer(), bytes, count < frameBufferSize ? count : frameBufferSize);
+}
+
+bool FlipDot34NanoGFX::updateNext() {
+    bool result = false;
+
+    uint8_t current_byte = frameBuffer[next_offset];
+    uint8_t target_byte = getBuffer()[next_offset];
+    if ((current_byte ^ target_byte) & next_mask) {
+        setDotStart(next_x, next_y, target_byte & next_mask);
+        result = true;
+    }
+    next_mask >>= 1;
+    if (next_mask == 0) {
+        next_mask = 0x80;
+        next_offset++;
+    }
+    ++next_x; 
+    if (next_x >= WIDTH) {
+        next_x = 0;
+        next_y++; 
+    }
+    if (next_y >= HEIGHT) {
+        next_y = 0;
+    }
+    return result;
 }

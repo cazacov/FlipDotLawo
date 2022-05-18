@@ -4,24 +4,23 @@ namespace HostApp
 {
     public partial class MainForm : Form
     {
-        private SerialPort port;
         private FrameManager frameManager;
         private int displayWidth;
         private int displayHeight;
         private Frame frame;
         private FrameRenderer frameRenderer;
         private bool isConnected;
-        private readonly PortManager portManager;
+        private readonly BusPirateClient busPirateClient;
 
         public MainForm()
         {
             InitializeComponent();
-            this.portManager = new PortManager();
-            portManager.DataReceived += PortManager_DataReceived;
+            this.busPirateClient = new BusPirateClient();
+            busPirateClient.DataReceived += BusPirateClientDataReceived;
 
         }
 
-        private void PortManager_DataReceived(object? sender, ReceiveEventArgs e)
+        private void BusPirateClientDataReceived(object? sender, ReceiveEventArgs e)
         {
             this.AddToLogSafe(e.Text);
         }
@@ -58,7 +57,7 @@ namespace HostApp
         private void FillComPorts()
         {
             cbPorts.Items.Clear();
-            foreach (var port in portManager.ListPorts())
+            foreach (var port in busPirateClient.ListPorts())
             {
                 cbPorts.Items.Add(port);
             }
@@ -76,7 +75,7 @@ namespace HostApp
             {
                 return;
             }
-            isConnected = portManager.TryConnect(portName);
+            isConnected = busPirateClient.TryConnect(portName);
         }
 
         
@@ -124,7 +123,7 @@ namespace HostApp
             DisplayFrame();
             if (isConnected)
             {
-
+                busPirateClient.SendBitmap(this.frame);
             }
         }
 

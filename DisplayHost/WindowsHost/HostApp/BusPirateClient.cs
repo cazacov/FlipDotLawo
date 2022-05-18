@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace HostApp
 {
-    internal class PortManager
+    internal class BusPirateClient
     {
         private SerialPort port;
         public event EventHandler<ReceiveEventArgs> DataReceived;
         public bool IsConnected { get; private set; }
 
-        public PortManager()
+        public BusPirateClient()
         {
             this.port = null;
         }
@@ -61,6 +61,8 @@ namespace HostApp
             port.WriteLine("4");
             port.WriteLine("3");
             Thread.Sleep(100);
+            port.WriteLine("W");
+            Thread.Sleep(100);
             port.WriteLine("P");
             return true;
         }
@@ -78,6 +80,52 @@ namespace HostApp
                 txt += ch;
             }
             OnDataReceived(new ReceiveEventArgs() { Text = txt});
+        }
+
+        public void SendBitmap(Frame frame, int address = 0x4E)
+        {
+            var builder = new StringBuilder();
+            builder.Append("[ ");
+            builder.Append($"{address} 9 0 0 {frame.Width} {frame.Height} ");
+            var bytesInRow = (frame.Width + 7) & 0x07;
+
+            for (var y = 0; y < frame.Height; y++)
+            {
+                byte nextByte = 0;
+                byte mask = 0x80;
+                for (var x = 0; x < frame.Width; x++)
+                {
+                    if (frame.Pixels[y, x])
+                    {
+                        nextByte |= mask;
+                    }
+                    mask >>= 1;
+                    if (mask == 0)
+                    {
+                        builder.Append($"0x{nextByte:X2} ");
+                        nextByte = 0;
+                        mask = 0x80;
+                    }
+                }
+                if (mask != 0x80)
+                {
+                    builder.Append($"0x{nextByte:X2} ");
+                    nextByte = 0;
+                    mask = 0x80;
+                }
+                if (y % 5 == 4)
+                {
+                    builder.Append("]");
+                    var cmd = builder.ToString();
+                    port.WriteLine(cmd);
+                    Thread.Sleep(50);
+                    builder.Clear();
+                    builder.Append($"[ { address} ");
+                }
+            }
+            builder.Append("]");
+            var command = builder.ToString();
+            port.WriteLine(command);
         }
     }
 

@@ -63,7 +63,7 @@
             // 
             this.cbPorts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbPorts.FormattingEnabled = true;
-            this.cbPorts.Location = new System.Drawing.Point(190, 23);
+            this.cbPorts.Location = new System.Drawing.Point(286, 25);
             this.cbPorts.Name = "cbPorts";
             this.cbPorts.Size = new System.Drawing.Size(242, 40);
             this.cbPorts.TabIndex = 1;
@@ -73,13 +73,13 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(46, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(117, 32);
+            this.label1.Size = new System.Drawing.Size(229, 32);
             this.label1.TabIndex = 2;
-            this.label1.Text = "COM Port";
+            this.label1.Text = "Bus Pirate COM Port";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(460, 17);
+            this.button1.Location = new System.Drawing.Point(556, 19);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(150, 46);
             this.button1.TabIndex = 3;

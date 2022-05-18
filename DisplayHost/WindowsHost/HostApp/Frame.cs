@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HostApp
 {
-    internal class Frame
+    public class Frame
     {
         public readonly int Width;
         public readonly int Height;
@@ -18,7 +18,5 @@ namespace HostApp
             this.Height = height;
             this.Pixels = new bool[height, width];
         }
-
-        public Bitmap Preview { get; set; }
     }
 }

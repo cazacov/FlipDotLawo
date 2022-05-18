@@ -7,10 +7,12 @@ namespace HostApp
         private FrameManager frameManager;
         private int displayWidth;
         private int displayHeight;
-        private Frame frame;
+        private Frame currentFrame;
         private FrameRenderer frameRenderer;
         private bool isConnected;
         private readonly BusPirateClient busPirateClient;
+        private Player player;
+        private bool isPlaying;
 
         public MainForm()
         {
@@ -32,6 +34,46 @@ namespace HostApp
             UpdateDisplaySize();
             this.frameManager = new FrameManager();
             this.frameRenderer = new FrameRenderer();
+            this.player = new Player(this.frameManager, this.frameRenderer);
+            player.FrameLoaded += (o, args) =>
+            {
+                ShowFrameSafe(args.FrameNo, args.Frame);
+            };
+            player.PlayFinished += (o, args) =>
+            {
+                this.isPlaying = false;
+                ShowFinishedSafe();
+            };
+        }
+
+        private void ShowFinishedSafe()
+        {
+            if (btPlay.InvokeRequired)
+            {
+                btPlay.Invoke((Action)(ShowFinishedSafe));
+            }
+            else
+            {
+                btPlay.Text = "Play";
+            }
+        }
+
+        private void ShowFrameSafe(int frameNo, Frame frame)
+        {
+            if (lbFrame.InvokeRequired)
+            {
+                void SafeShowFrame()
+                {
+                    ShowFrameSafe(frameNo, frame);
+                }
+                txtLog.Invoke((Action)SafeShowFrame);
+            }
+            else
+            {
+                lbFrame.Text = $"Frame: {frameNo}";
+                DisplayFrame(frame);
+                Application.DoEvents();
+            }
         }
 
         private void UpdateDisplaySize()
@@ -78,8 +120,6 @@ namespace HostApp
             isConnected = busPirateClient.TryConnect(portName);
         }
 
-        
-
         public void AddToLogSafe(string text)
         {
             if (txtLog.InvokeRequired)
@@ -119,21 +159,22 @@ namespace HostApp
 
         private void LoadFrame(string fileName)
         {
-            this.frame = frameManager.LoadFrame(fileName, displayWidth, displayHeight);
-            DisplayFrame();
+            this.currentFrame = frameManager.LoadFrame(fileName, displayWidth, displayHeight);
+            DisplayFrame(this.currentFrame);
             if (isConnected)
             {
-                busPirateClient.SendBitmap(this.frame);
+                //busPirateClient.SendBitmap(this.currentFrame);
             }
         }
 
-        private void DisplayFrame()
+        private void DisplayFrame(Frame frame)
         {
             if (this.pbFrame.Image != null)
             {
                 this.pbFrame.Image.Dispose();
+                this.pbFrame.Image = null;
             }
-            this.pbFrame.Image = frameRenderer.RenderFrame(this.frame, this.pbFrame.Size);
+            this.pbFrame.Image = frameRenderer.RenderFrame(frame, this.pbFrame.Size);
         }
 
         private void cbSize_SelectedIndexChanged(object sender, EventArgs e)
@@ -141,5 +182,18 @@ namespace HostApp
             UpdateDisplaySize();
         }
 
+        private void btPlay_Click(object sender, EventArgs e)
+        {
+            if (!isPlaying)
+            {
+                btPlay.Text = "Stop";
+                isPlaying = true;
+                player.Play(tbPath.Text, displayWidth, displayHeight);
+            }
+            else
+            {
+                player.Stop();
+            }
+        }
     }
 }

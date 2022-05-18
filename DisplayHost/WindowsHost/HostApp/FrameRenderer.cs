@@ -36,7 +36,7 @@ internal class FrameRenderer
                 }
             }
         }
-
+        gt.Dispose();
         return result;
     }
 }

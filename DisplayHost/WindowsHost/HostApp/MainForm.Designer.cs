@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.cbPorts = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -38,12 +39,15 @@
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.pbFrame = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.pbPreview = new System.Windows.Forms.PictureBox();
             this.btLoad = new System.Windows.Forms.Button();
+            this.tbPath = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tFrames = new System.Windows.Forms.Timer(this.components);
+            this.btPlay = new System.Windows.Forms.Button();
+            this.lbFrame = new System.Windows.Forms.Label();
             this.pblLog.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbFrame)).BeginInit();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.SuspendLayout();
             // 
             // txtLog
@@ -149,7 +153,10 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.pbPreview);
+            this.panel1.Controls.Add(this.lbFrame);
+            this.panel1.Controls.Add(this.btPlay);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.tbPath);
             this.panel1.Controls.Add(this.btLoad);
             this.panel1.Controls.Add(this.pbFrame);
             this.panel1.Controls.Add(this.cbSize);
@@ -160,23 +167,55 @@
             this.panel1.Size = new System.Drawing.Size(1814, 651);
             this.panel1.TabIndex = 9;
             // 
-            // pbPreview
-            // 
-            this.pbPreview.Location = new System.Drawing.Point(782, 78);
-            this.pbPreview.Name = "pbPreview";
-            this.pbPreview.Size = new System.Drawing.Size(674, 550);
-            this.pbPreview.TabIndex = 10;
-            this.pbPreview.TabStop = false;
-            // 
             // btLoad
             // 
-            this.btLoad.Location = new System.Drawing.Point(1528, 93);
+            this.btLoad.Location = new System.Drawing.Point(759, 582);
             this.btLoad.Name = "btLoad";
             this.btLoad.Size = new System.Drawing.Size(150, 46);
             this.btLoad.TabIndex = 9;
             this.btLoad.Text = "Load";
             this.btLoad.UseVisualStyleBackColor = true;
             this.btLoad.Click += new System.EventHandler(this.btLoad_Click);
+            // 
+            // tbPath
+            // 
+            this.tbPath.Location = new System.Drawing.Point(926, 82);
+            this.tbPath.Name = "tbPath";
+            this.tbPath.Size = new System.Drawing.Size(837, 39);
+            this.tbPath.TabIndex = 10;
+            this.tbPath.Text = "E:\\Git\\FlipDotLawo\\DisplayHost\\Esp32\\BadApple\\Frames-30fps";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(768, 87);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(145, 32);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Images path";
+            // 
+            // tFrames
+            // 
+            this.tFrames.Interval = 33;
+            // 
+            // btPlay
+            // 
+            this.btPlay.Location = new System.Drawing.Point(779, 177);
+            this.btPlay.Name = "btPlay";
+            this.btPlay.Size = new System.Drawing.Size(150, 46);
+            this.btPlay.TabIndex = 12;
+            this.btPlay.Text = "Play";
+            this.btPlay.UseVisualStyleBackColor = true;
+            this.btPlay.Click += new System.EventHandler(this.btPlay_Click);
+            // 
+            // lbFrame
+            // 
+            this.lbFrame.AutoSize = true;
+            this.lbFrame.Location = new System.Drawing.Point(974, 185);
+            this.lbFrame.Name = "lbFrame";
+            this.lbFrame.Size = new System.Drawing.Size(134, 32);
+            this.lbFrame.TabIndex = 13;
+            this.lbFrame.Text = "Frame: XXX";
             // 
             // MainForm
             // 
@@ -194,7 +233,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbFrame)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -212,6 +250,10 @@
         private PictureBox pbFrame;
         private Panel panel1;
         private Button btLoad;
-        private PictureBox pbPreview;
+        private Label label3;
+        private TextBox tbPath;
+        private Label lbFrame;
+        private Button btPlay;
+        private System.Windows.Forms.Timer tFrames;
     }
 }

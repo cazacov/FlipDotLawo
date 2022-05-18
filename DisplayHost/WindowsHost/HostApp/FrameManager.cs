@@ -46,7 +46,8 @@ namespace HostApp
                 new Rectangle(dx, dy, sx, sy),
                 0, 0, image.Width, image.Height, GraphicsUnit.Pixel
             );
-
+            image.Dispose();
+            
             for (var y = 0; y < height; y++)
             {
                 for (var x = 0; x < width; x++)
@@ -55,6 +56,8 @@ namespace HostApp
                     result.Pixels[y, x] = color.GetBrightness() > 0.5;
                 }
             }
+            g.Dispose();
+            target.Dispose();
             return result;
         }
 

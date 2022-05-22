@@ -4,13 +4,14 @@
 #include <SPI.h> // Adafruit_GFX needs this
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_GFX.h>
+#include <GFXcanvas7bit.h>
 
 enum class StackMode {
     kRow,
     kStacked
 };
 
-class FlipDot34NanoGFX : public GFXcanvas1 {
+class FlipDot34NanoGFX : public GFXcanvas7bit {
 public:    
     FlipDot34NanoGFX(int matrix_width, int matrix_height, int matrix_columns, StackMode stack_mode);
     void setDot(int x, int y, bool state);

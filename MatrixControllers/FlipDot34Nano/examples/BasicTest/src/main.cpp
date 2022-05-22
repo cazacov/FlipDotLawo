@@ -24,6 +24,20 @@ void loop() {
       delay(5);
     }
   }
-  delay(3000);
+  delay(3);
+  uint8_t lineLen = display.width() - display.height() + 1;
+  for (int y = 0; y < display.height(); y++) {
+    display.startWrite();
+    if (y > 0) {
+      display.drawLine(0,y, y-1, y, 0);
+    }
+    display.drawLine(y,y, y + lineLen - 1, y, 1);
+    if (y < display.height() - 1) {
+      display.drawLine(y+lineLen,y, display.width() - 1, y, 0);
+    }
+    display.endWrite();
+  }
+
+  delay(30000);
   color = 1 - color;
 }

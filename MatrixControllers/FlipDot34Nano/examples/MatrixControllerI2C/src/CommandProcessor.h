@@ -17,7 +17,7 @@ enum class GfxCommand {
 
 class CommandProcessor {
 private:
-    Adafruit_GFX* display_;
+    FlipDot34NanoGFX* display_;
     bool is_receiving_;
     size_t awaiting_bytes;
     size_t offset; 
@@ -29,7 +29,7 @@ private:
 
     uint8_t color;
 public:
-    CommandProcessor(Adafruit_GFX* display) : 
+    CommandProcessor(FlipDot34NanoGFX* display) : 
         display_(display)
     {
         command_ = GfxCommand::kNop;

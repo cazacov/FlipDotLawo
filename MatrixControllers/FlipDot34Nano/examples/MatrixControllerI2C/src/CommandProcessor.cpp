@@ -10,9 +10,8 @@ void CommandProcessor::processByte(uint8_t next_byte) {
                 uint8_t h = buffer[3];
                 uint8_t row = (w + 7) >> 3;
                 awaiting_bytes = row * h;
-/*                Serial.print(" Bitmap ");
-                Serial.println(awaiting_bytes);
-*/                
+//                Serial.print(" Bitmap ");
+//                Serial.println(awaiting_bytes);
                 is_receiving_ = awaiting_bytes;
             }
             else {
@@ -152,6 +151,8 @@ void CommandProcessor::executeCommand() {
 }
 
 void CommandProcessor::copyBitmap(uint8_t x0, uint8_t y0, uint8_t w, uint8_t h, uint8_t *bytes) {
+    display_->setBitmap(bytes, 76);
+    return;
     uint8_t mask = 0x80;
     uint8_t yy = y0;
     for (int i = 0; i < w; i++) {

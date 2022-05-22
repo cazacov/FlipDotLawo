@@ -15,7 +15,7 @@
 #define pauseLengthMicroseconds 100
 
 FlipDot34NanoGFX::FlipDot34NanoGFX(int matrix_width, int matrix_height, int matrix_columns, StackMode stack_mode)
-    : GFXcanvas1(matrix_width * matrix_columns, stack_mode == StackMode::kRow ? matrix_height : matrix_height * 2)
+    : GFXcanvas7bit(matrix_width * matrix_columns, stack_mode == StackMode::kRow ? matrix_height : matrix_height * 2)
 {
     is_stacked_ = stack_mode == StackMode::kStacked;
 

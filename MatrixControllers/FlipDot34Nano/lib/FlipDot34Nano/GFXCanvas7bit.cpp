@@ -8,6 +8,8 @@ const uint8_t PROGMEM GFXcanvas7bit::GFXclrBit[] = {0x7F, 0xBF, 0xDF, 0xEF,
                                                  0xF7, 0xFB, 0xFD, 0xFE};
 #endif
 
+#define BITS_IN_BYTE 8
+
 /**************************************************************************/
 /*!
    @brief    Instatiate a GFX 1-bit canvas context for graphics
@@ -16,7 +18,8 @@ const uint8_t PROGMEM GFXcanvas7bit::GFXclrBit[] = {0x7F, 0xBF, 0xDF, 0xEF,
 */
 /**************************************************************************/
 GFXcanvas7bit::GFXcanvas7bit(uint16_t w, uint16_t h) : Adafruit_GFX(w, h) {
-  uint16_t bytes = ((w + 7) / 8) * h;
+  bytesInRow = (w + BITS_IN_BYTE - 1) / BITS_IN_BYTE;
+  uint16_t bytes = bytesInRow * h;
   if ((buffer = (uint8_t *)malloc(bytes))) {
     memset(buffer, 0, bytes);
   }
@@ -63,17 +66,19 @@ void GFXcanvas7bit::drawPixel(int16_t x, int16_t y, uint16_t color) {
       break;
     }
 
-    uint8_t *ptr = &buffer[(x / 8) + y * ((WIDTH + 7) / 8)];
+    uint8_t byte_nr = x / BITS_IN_BYTE;
+    uint8_t bit_nr = x % BITS_IN_BYTE;
+    uint8_t *ptr = &buffer[byte_nr + y * bytesInRow];
 #ifdef __AVR__
     if (color)
-      *ptr |= pgm_read_byte(&GFXsetBit[x & 7]);
+      *ptr |= pgm_read_byte(&GFXsetBit[bit_nr]);
     else
-      *ptr &= pgm_read_byte(&GFXclrBit[x & 7]);
+      *ptr &= pgm_read_byte(&GFXclrBit[bit_nr]);
 #else
     if (color)
-      *ptr |= 0x80 >> (x & 7);
+      *ptr |= 0x80 >> bit_nr;
     else
-      *ptr &= ~(0x80 >> (x & 7));
+      *ptr &= ~(0x80 >> bit_nr);
 #endif
   }
 }
@@ -124,12 +129,15 @@ bool GFXcanvas7bit::getRawPixel(int16_t x, int16_t y) const {
     return 0;
   if (this->getBuffer()) {
     uint8_t *buffer = this->getBuffer();
-    uint8_t *ptr = &buffer[(x / 8) + y * ((WIDTH + 7) / 8)];
+    uint8_t byte_nr = x / BITS_IN_BYTE;
+    uint8_t bit_nr = x % BITS_IN_BYTE;
+
+    uint8_t *ptr = &buffer[byte_nr + y * bytesInRow];
 
 #ifdef __AVR__
-    return ((*ptr) & pgm_read_byte(&GFXsetBit[x & 7])) != 0;
+    return ((*ptr) & pgm_read_byte(&GFXsetBit[bit_nr])) != 0;
 #else
-    return ((*ptr) & (0x80 >> (x & 7))) != 0;
+    return ((*ptr) & (0x80 >> bit_nr)) != 0;
 #endif
   }
   return 0;
@@ -143,7 +151,7 @@ bool GFXcanvas7bit::getRawPixel(int16_t x, int16_t y) const {
 /**************************************************************************/
 void GFXcanvas7bit::fillScreen(uint16_t color) {
   if (buffer) {
-    uint16_t bytes = ((WIDTH + 7) / 8) * HEIGHT;
+    uint16_t bytes = bytesInRow * HEIGHT;
     memset(buffer, color ? 0xFF : 0x00, bytes);
   }
 }
@@ -271,29 +279,32 @@ void GFXcanvas7bit::drawFastHLine(int16_t x, int16_t y, int16_t w,
 void GFXcanvas7bit::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
                                   uint16_t color) {
   // x & y already in raw (rotation 0) coordinates, no need to transform.
-  int16_t row_bytes = ((WIDTH + 7) / 8);
   uint8_t *buffer = this->getBuffer();
-  uint8_t *ptr = &buffer[(x / 8) + y * row_bytes];
+
+  uint8_t byte_nr = x / BITS_IN_BYTE;
+  uint8_t bit_nr = x % BITS_IN_BYTE;
+
+  uint8_t *ptr = &buffer[byte_nr + y * bytesInRow];
 
   if (color > 0) {
 #ifdef __AVR__
-    uint8_t bit_mask = pgm_read_byte(&GFXsetBit[x & 7]);
+    uint8_t bit_mask = pgm_read_byte(&GFXsetBit[bit_nr]);
 #else
-    uint8_t bit_mask = (0x80 >> (x & 7));
+    uint8_t bit_mask = (0x80 >> bit_nr);
 #endif
     for (int16_t i = 0; i < h; i++) {
       *ptr |= bit_mask;
-      ptr += row_bytes;
+      ptr += bytesInRow;
     }
   } else {
 #ifdef __AVR__
-    uint8_t bit_mask = pgm_read_byte(&GFXclrBit[x & 7]);
+    uint8_t bit_mask = pgm_read_byte(&GFXclrBit[bit_nr]);
 #else
-    uint8_t bit_mask = ~(0x80 >> (x & 7));
+    uint8_t bit_mask = ~(0x80 >> bit_nr);
 #endif
     for (int16_t i = 0; i < h; i++) {
       *ptr &= bit_mask;
-      ptr += row_bytes;
+      ptr += bytesInRow;
     }
   }
 }
@@ -310,16 +321,17 @@ void GFXcanvas7bit::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
 void GFXcanvas7bit::drawFastRawHLine(int16_t x, int16_t y, int16_t w,
                                   uint16_t color) {
   // x & y already in raw (rotation 0) coordinates, no need to transform.
-  int16_t rowBytes = ((WIDTH + 7) / 8);
   uint8_t *buffer = this->getBuffer();
-  uint8_t *ptr = &buffer[(x / 8) + y * rowBytes];
+  uint8_t byte_nr = x / BITS_IN_BYTE;
+  uint8_t bit_nr = x % BITS_IN_BYTE;
+  uint8_t *ptr = &buffer[byte_nr + y * bytesInRow];
   size_t remainingWidthBits = w;
 
   // check to see if first byte needs to be partially filled
   if ((x & 7) > 0) {
     // create bit mask for first byte
     uint8_t startByteBitMask = 0x00;
-    for (int8_t i = (x & 7); ((i < 8) && (remainingWidthBits > 0)); i++) {
+    for (int8_t i = bit_nr; ((i < BITS_IN_BYTE) && (remainingWidthBits > 0)); i++) {
 #ifdef __AVR__
       startByteBitMask |= pgm_read_byte(&GFXsetBit[i]);
 #else
@@ -338,8 +350,8 @@ void GFXcanvas7bit::drawFastRawHLine(int16_t x, int16_t y, int16_t w,
 
   // do the next remainingWidthBits bits
   if (remainingWidthBits > 0) {
-    size_t remainingWholeBytes = remainingWidthBits / 8;
-    size_t lastByteBits = remainingWidthBits % 8;
+    size_t remainingWholeBytes = remainingWidthBits / BITS_IN_BYTE;
+    size_t lastByteBits = remainingWidthBits % BITS_IN_BYTE;
     uint8_t wholeByteColor = color > 0 ? 0xFF : 0x00;
 
     memset(ptr, wholeByteColor, remainingWholeBytes);
@@ -360,6 +372,6 @@ void GFXcanvas7bit::drawFastRawHLine(int16_t x, int16_t y, int16_t w,
       } else {
         *ptr &= ~lastByteBitMask;
       }
-    }
+    }  
   }
 }

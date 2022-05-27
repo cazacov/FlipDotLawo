@@ -37,6 +37,7 @@ protected:
     uint8_t next_x;
     uint8_t next_y;
     uint8_t next_mask;
+    uint8_t next_bit_nr;
     uint8_t *next_screen_ptr;
     uint8_t *next_target_ptr;
 

@@ -9,8 +9,12 @@ FlipDot34NanoGFX display(28, 19, 1, StackMode::kRow);
 void setup() {
   Serial.begin(115200);
   display.startWrite();
+  display.fillScreen(1); 
+  display.endWrite();
+  display.startWrite();
   display.fillScreen(0); 
   display.endWrite();
+  delay(1000);
 }
 
 int color = 1;

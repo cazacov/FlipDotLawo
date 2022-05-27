@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 
+#define BITS_IN_BYTE 7
+
 class GFXcanvas7bit : public Adafruit_GFX {
 public:
   GFXcanvas7bit(uint16_t w, uint16_t h);
@@ -25,7 +27,7 @@ protected:
   void drawFastRawVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
   void drawFastRawHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
 
-private:
+protected:
   uint8_t *buffer;
   uint8_t bytesInRow;
 

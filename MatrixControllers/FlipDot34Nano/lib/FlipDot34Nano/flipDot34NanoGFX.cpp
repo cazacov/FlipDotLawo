@@ -24,7 +24,7 @@ FlipDot34NanoGFX::FlipDot34NanoGFX(int matrix_width, int matrix_height, int matr
     matrix_columns_ = matrix_columns;
     display_width_ = matrix_width * matrix_columns;
     display_height_ = matrix_height;
-    frameBufferWidth = (WIDTH + 7) >> 3;
+    frameBufferWidth = bytesInRow;
     frameBufferSize = frameBufferWidth * HEIGHT;
     frameBuffer = (uint8_t *)malloc(frameBufferSize);
     memset(frameBuffer, 0, frameBufferSize);
@@ -260,6 +260,7 @@ void FlipDot34NanoGFX::clearScreen()
     next_x = 0;
     next_y = 0;
     next_mask = 0x80;
+    next_bit_nr = 0;
     next_screen_ptr = frameBuffer;
     next_target_ptr = getBuffer();
 }
@@ -273,6 +274,7 @@ void FlipDot34NanoGFX::endWrite(void)
     for (int16_t y = 0; y < HEIGHT; y++) 
     {
         uint8_t mask = 0x80;
+        uint8_t bit_nr = 0;
         uint8_t buf_val = *buf_ptr;
         uint8_t canvas_val = *canvas_ptr;
         for (int16_t x = 0; x < WIDTH; x++)
@@ -282,16 +284,18 @@ void FlipDot34NanoGFX::endWrite(void)
                 setDot(x, y, canvas_val & mask);
             }
             mask >>= 1;
-            if (!mask)
+            bit_nr++;
+            if (bit_nr == BITS_IN_BYTE)
             {
                 mask = 0x80;
+                bit_nr = 0;
                 buf_ptr++;
                 canvas_ptr++;
                 buf_val = *buf_ptr;
                 canvas_val = *canvas_ptr;
             }
         }
-        if (WIDTH & 0x07)
+        if (bit_nr)
         {
             buf_ptr++;
             canvas_ptr++;
@@ -302,6 +306,7 @@ void FlipDot34NanoGFX::endWrite(void)
     next_x = 0;
     next_y = 0;
     next_mask = 0x80;
+    next_bit_nr = 0;
     next_screen_ptr = frameBuffer;
     next_target_ptr = getBuffer();
 }
@@ -336,8 +341,10 @@ bool FlipDot34NanoGFX::updateNext() {
         result = true;
     }
     next_mask >>= 1;
-    if (next_mask == 0) {
+    next_bit_nr++;
+    if (next_bit_nr == BITS_IN_BYTE) {
         next_mask = 0x80;
+        next_bit_nr = 0;
         next_screen_ptr++;
         next_target_ptr++;
     }
@@ -345,16 +352,18 @@ bool FlipDot34NanoGFX::updateNext() {
     if (next_x >= WIDTH) {
         next_x = 0;
         next_y++; 
-        if (next_mask != 0x80) {
+        if (next_bit_nr) {
             next_screen_ptr++;
             next_target_ptr++;
             next_mask = 0x80;
+            next_bit_nr = 0;
         }
     }
     if (next_y >= HEIGHT) {
         next_x = 0;
         next_y = 0;
         next_mask = 0x80;
+        next_bit_nr = 0;
         next_screen_ptr = frameBuffer;
         next_target_ptr = getBuffer();
     }

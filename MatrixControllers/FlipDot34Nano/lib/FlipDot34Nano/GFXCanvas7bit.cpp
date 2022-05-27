@@ -8,8 +8,6 @@ const uint8_t PROGMEM GFXcanvas7bit::GFXclrBit[] = {0x7F, 0xBF, 0xDF, 0xEF,
                                                  0xF7, 0xFB, 0xFD, 0xFE};
 #endif
 
-#define BITS_IN_BYTE 8
-
 /**************************************************************************/
 /*!
    @brief    Instatiate a GFX 1-bit canvas context for graphics
@@ -328,7 +326,7 @@ void GFXcanvas7bit::drawFastRawHLine(int16_t x, int16_t y, int16_t w,
   size_t remainingWidthBits = w;
 
   // check to see if first byte needs to be partially filled
-  if ((x & 7) > 0) {
+  if (bit_nr > 0) {
     // create bit mask for first byte
     uint8_t startByteBitMask = 0x00;
     for (int8_t i = bit_nr; ((i < BITS_IN_BYTE) && (remainingWidthBits > 0)); i++) {

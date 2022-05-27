@@ -259,7 +259,7 @@ void FlipDot34NanoGFX::clearScreen()
     memset(getBuffer(), 0, frameBufferSize);
     next_x = 0;
     next_y = 0;
-    next_mask = 0x80;
+    next_mask = 0x01;
     next_bit_nr = 0;
     next_screen_ptr = frameBuffer;
     next_target_ptr = getBuffer();
@@ -273,7 +273,7 @@ void FlipDot34NanoGFX::endWrite(void)
 
     for (int16_t y = 0; y < HEIGHT; y++) 
     {
-        uint8_t mask = 0x80;
+        uint8_t mask = 0x01;
         uint8_t bit_nr = 0;
         uint8_t buf_val = *buf_ptr;
         uint8_t canvas_val = *canvas_ptr;
@@ -283,11 +283,11 @@ void FlipDot34NanoGFX::endWrite(void)
             {
                 setDot(x, y, canvas_val & mask);
             }
-            mask >>= 1;
+            mask <<= 1;
             bit_nr++;
             if (bit_nr == BITS_IN_BYTE)
             {
-                mask = 0x80;
+                mask = 0x01;
                 bit_nr = 0;
                 buf_ptr++;
                 canvas_ptr++;
@@ -305,7 +305,7 @@ void FlipDot34NanoGFX::endWrite(void)
     memcpy(frameBuffer, getBuffer(), frameBufferSize);
     next_x = 0;
     next_y = 0;
-    next_mask = 0x80;
+    next_mask = 0x01;
     next_bit_nr = 0;
     next_screen_ptr = frameBuffer;
     next_target_ptr = getBuffer();
@@ -340,10 +340,10 @@ bool FlipDot34NanoGFX::updateNext() {
         *next_screen_ptr = screen_byte; // write modified value back to the frame buffer
         result = true;
     }
-    next_mask >>= 1;
+    next_mask <<= 1;
     next_bit_nr++;
     if (next_bit_nr == BITS_IN_BYTE) {
-        next_mask = 0x80;
+        next_mask = 0x01;
         next_bit_nr = 0;
         next_screen_ptr++;
         next_target_ptr++;
@@ -355,14 +355,14 @@ bool FlipDot34NanoGFX::updateNext() {
         if (next_bit_nr) {
             next_screen_ptr++;
             next_target_ptr++;
-            next_mask = 0x80;
+            next_mask = 0x01;
             next_bit_nr = 0;
         }
     }
     if (next_y >= HEIGHT) {
         next_x = 0;
         next_y = 0;
-        next_mask = 0x80;
+        next_mask = 0x01;
         next_bit_nr = 0;
         next_screen_ptr = frameBuffer;
         next_target_ptr = getBuffer();

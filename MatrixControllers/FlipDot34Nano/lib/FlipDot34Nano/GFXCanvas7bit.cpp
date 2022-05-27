@@ -2,10 +2,10 @@
 
 #ifdef __AVR__
 // Bitmask tables of 0x80>>X and ~(0x80>>X), because X>>Y is slow on AVR
-const uint8_t PROGMEM GFXcanvas7bit::GFXsetBit[] = {0x80, 0x40, 0x20, 0x10,
-                                                 0x08, 0x04, 0x02, 0x01};
-const uint8_t PROGMEM GFXcanvas7bit::GFXclrBit[] = {0x7F, 0xBF, 0xDF, 0xEF,
-                                                 0xF7, 0xFB, 0xFD, 0xFE};
+const uint8_t PROGMEM GFXcanvas7bit::GFXsetBit[] = {0x01, 0x02, 0x04, 0x08,
+                                                 0x10, 0x20, 0x40, 0x80};
+const uint8_t PROGMEM GFXcanvas7bit::GFXclrBit[] = {0xFE, 0xFD, 0xFB, 0xF7,
+                                                    0xEF, 0xDF, 0xBF, 0x7F};
 #endif
 
 /**************************************************************************/
@@ -74,9 +74,9 @@ void GFXcanvas7bit::drawPixel(int16_t x, int16_t y, uint16_t color) {
       *ptr &= pgm_read_byte(&GFXclrBit[bit_nr]);
 #else
     if (color)
-      *ptr |= 0x80 >> bit_nr;
+      *ptr |= 0x01 << bit_nr;
     else
-      *ptr &= ~(0x80 >> bit_nr);
+      *ptr &= ~(0x01 << bit_nr);
 #endif
   }
 }
@@ -135,7 +135,7 @@ bool GFXcanvas7bit::getRawPixel(int16_t x, int16_t y) const {
 #ifdef __AVR__
     return ((*ptr) & pgm_read_byte(&GFXsetBit[bit_nr])) != 0;
 #else
-    return ((*ptr) & (0x80 >> bit_nr)) != 0;
+    return ((*ptr) & (0x01 << bit_nr)) != 0;
 #endif
   }
   return 0;
@@ -288,7 +288,7 @@ void GFXcanvas7bit::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
 #ifdef __AVR__
     uint8_t bit_mask = pgm_read_byte(&GFXsetBit[bit_nr]);
 #else
-    uint8_t bit_mask = (0x80 >> bit_nr);
+    uint8_t bit_mask = (0x01 << bit_nr);
 #endif
     for (int16_t i = 0; i < h; i++) {
       *ptr |= bit_mask;
@@ -298,7 +298,7 @@ void GFXcanvas7bit::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
 #ifdef __AVR__
     uint8_t bit_mask = pgm_read_byte(&GFXclrBit[bit_nr]);
 #else
-    uint8_t bit_mask = ~(0x80 >> bit_nr);
+    uint8_t bit_mask = ~(0x01 << bit_nr);
 #endif
     for (int16_t i = 0; i < h; i++) {
       *ptr &= bit_mask;
@@ -333,7 +333,7 @@ void GFXcanvas7bit::drawFastRawHLine(int16_t x, int16_t y, int16_t w,
 #ifdef __AVR__
       startByteBitMask |= pgm_read_byte(&GFXsetBit[i]);
 #else
-      startByteBitMask |= (0x80 >> i);
+      startByteBitMask |= (0x01 << i);
 #endif
       remainingWidthBits--;
     }
@@ -360,7 +360,7 @@ void GFXcanvas7bit::drawFastRawHLine(int16_t x, int16_t y, int16_t w,
 #ifdef __AVR__
         lastByteBitMask |= pgm_read_byte(&GFXsetBit[i]);
 #else
-        lastByteBitMask |= (0x80 >> i);
+        lastByteBitMask |= (0x01 << i);
 #endif
       }
       ptr += remainingWholeBytes;

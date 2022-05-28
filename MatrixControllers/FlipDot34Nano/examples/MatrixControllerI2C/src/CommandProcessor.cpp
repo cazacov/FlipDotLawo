@@ -2,6 +2,14 @@
 
 void CommandProcessor::processByte(uint8_t next_byte) {
     if (is_receiving_) {
+        if (next_byte & COMMAND_FLAG) {
+
+            Serial.print("ERR 1 ");  // Awaiting info byte, got command  
+            Serial.print(awaiting_bytes);
+            Serial.print(" ");
+            Serial.println(next_byte, HEX);
+            got_new_command(next_byte);
+        }
         buffer[offset++] = next_byte;
         awaiting_bytes--;
         if (awaiting_bytes == 0) {
@@ -20,16 +28,18 @@ void CommandProcessor::processByte(uint8_t next_byte) {
             }
         }
     } else {
-        is_receiving_ = decodeCommand(next_byte);
-/*        
-        Serial.print(" Decode ");
-        Serial.print((int)command_);
-        Serial.print(" ");
-        Serial.println(awaiting_bytes);
-*/        
-        if (!is_receiving_) {   // Self-contained command
-            executeCommand();
+        if (!(next_byte & COMMAND_FLAG)) {
+            Serial.println("ERR 2");  // Awaiting command, got info byte       
+        } else {   
+            got_new_command(next_byte);
         }
+    }
+}
+
+void CommandProcessor::got_new_command(uint8_t next_byte) {
+     is_receiving_ = decodeCommand(next_byte);
+     if (!is_receiving_) {   // Self-contained command
+            executeCommand();
     }
 }
 

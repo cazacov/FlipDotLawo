@@ -13,13 +13,11 @@ void CommandProcessor::processByte(uint8_t next_byte) {
         buffer[offset++] = next_byte;
         awaiting_bytes--;
         if (awaiting_bytes == 0) {
-            if (command_ == GfxCommand::kBitmap && offset == 4) {
+            if (command_ == GfxCommand::kBitmap && offset == 4) {   // Variable length command, calculate remaining buffer length
                 uint8_t w = buffer[2];
                 uint8_t h = buffer[3];
                 uint8_t row = (w + 7) >> 3;
                 awaiting_bytes = row * h;
-//                Serial.print(" Bitmap ");
-//                Serial.println(awaiting_bytes);
                 is_receiving_ = awaiting_bytes;
             }
             else {
@@ -39,7 +37,7 @@ void CommandProcessor::processByte(uint8_t next_byte) {
 void CommandProcessor::got_new_command(uint8_t next_byte) {
      is_receiving_ = decodeCommand(next_byte);
      if (!is_receiving_) {   // Self-contained command
-            executeCommand();
+        executeCommand();
     }
 }
 
@@ -50,6 +48,11 @@ bool CommandProcessor::decodeCommand(uint8_t data) {
             command_ = GfxCommand::kClear;
             awaiting_bytes = 0;
             return false;
+            break;
+        case (int)GfxCommand::kSetDelays:
+            command_ = GfxCommand::kSetDelays;
+            awaiting_bytes = 1;
+            return true;
             break;
         case (int)GfxCommand::kFill:
             command_ = GfxCommand::kFill;
@@ -104,11 +107,20 @@ void CommandProcessor::executeCommand() {
     uint8_t y;
     uint8_t w;
     uint8_t h;
+    uint8_t factor;
     switch (command_) {
         case GfxCommand::kClear:
             for (int16_t y = 0; y < display_->height(); y++) {
                 display_->writeFastHLine(0, y, display_->width(), 0);
             }
+            break;
+        case GfxCommand::kSetDelays:
+            factor = buffer[0];
+            if (factor < 10) {
+                factor = 10;
+            }
+            pulse_microseconds = PULSE_MICROSECONDS * factor / 100;
+            delay_microseconds = DELAY_MICROSECONDS * factor / 100;
             break;
         case GfxCommand::kFill:
             for (int16_t y = 0; y < display_->height(); y++) {
@@ -163,6 +175,7 @@ void CommandProcessor::executeCommand() {
 void CommandProcessor::copyBitmap(uint8_t x0, uint8_t y0, uint8_t w, uint8_t h, uint8_t *bytes) {
     display_->setBitmap(bytes, 76);
     return;
+// TODO: allow partial screen updating    
     uint8_t mask = 0x80;
     uint8_t yy = y0;
     for (int i = 0; i < w; i++) {
@@ -183,3 +196,15 @@ void CommandProcessor::copyBitmap(uint8_t x0, uint8_t y0, uint8_t w, uint8_t h, 
         yy++;
     }
 }
+
+ void CommandProcessor::simulateCommand(GfxCommand command, int byte_count, ...) {
+    
+    va_list valist;
+    va_start(valist, byte_count);
+    for (int i = 0; i < byte_count; i++) {
+      buffer[i] = va_arg(valist, int);
+    }
+    va_end(valist);
+    command_ = command;
+    executeCommand();
+ }

@@ -11,8 +11,8 @@
 #define addr1pin A1
 #define addr2pin A2
 
-#define pulseLengthMicroseconds 200
-#define pauseLengthMicroseconds 100
+#define pulseLengthMicroseconds 200L
+#define pauseLengthMicroseconds 50L
 
 FlipDot34NanoGFX::FlipDot34NanoGFX(int matrix_width, int matrix_height, int matrix_columns, StackMode stack_mode)
     : GFXcanvas7bit(matrix_width * matrix_columns, stack_mode == StackMode::kRow ? matrix_height : matrix_height * 2)

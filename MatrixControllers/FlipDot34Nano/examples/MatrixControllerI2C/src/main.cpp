@@ -14,8 +14,8 @@ CommandProcessor processor(&display);
 const uint8_t STATE_IDLE = 0;
 const uint8_t STATE_PULSE = 1;
 const uint8_t STATE_DELAY = 2;
-const long PULSE_MICROSECONDS = 300;
-const long DELAY_MICROSECONDS = 200;
+const uint8_t STATE_TEST = 2;
+
 
 const int debugPin = 8;
 uint8_t volatile state = STATE_IDLE;
@@ -31,7 +31,7 @@ void setup() {
 
   address = 0x20 + display.readConfig();
   display.clearScreen();
-  sprintf(buf, "0x%02X", address * 2);
+  sprintf(buf, "0x%02X", address);
   display.printCentered(buf, display.width()/2, display.height()/2);
   display.endWrite();
   
@@ -48,10 +48,14 @@ void setup() {
   Timer1.attachInterrupt(timerCallback);
   Timer1.stop();
 
+  // Test 
+  //processor.simulateCommand(GfxCommand::kClear, 0);
+  //processor.simulateCommand(GfxCommand::kSetDelays, 1, 100);
+  //processor.simulateCommand(GfxCommand::kFillRect, 4, 3, 2, 22, 15);
 }
 
 void loop() {
-  if (state != STATE_IDLE) {
+  if (state != STATE_IDLE) { 
     return;
   }
 
@@ -59,8 +63,8 @@ void loop() {
     ; // do nothing
   }
   digitalWrite(debugPin, HIGH);
-  Timer1.setPeriod(PULSE_MICROSECONDS);
   state = STATE_PULSE;
+  Timer1.setPeriod(processor.pulse_microseconds);
 }
 
 void receiveEvent(int howMany)
@@ -82,7 +86,7 @@ void timerCallback() {
     state = STATE_DELAY;
     display.endPulse();
     digitalWrite(debugPin, LOW);
-    Timer1.setPeriod(DELAY_MICROSECONDS);
+    Timer1.setPeriod(processor.delay_microseconds);
   } else if (state == STATE_DELAY) {
       state = STATE_IDLE;
   }

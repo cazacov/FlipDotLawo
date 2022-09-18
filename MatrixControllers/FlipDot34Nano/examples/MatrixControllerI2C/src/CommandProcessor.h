@@ -2,6 +2,9 @@
 #include <Arduino.h>
 #include "flipDot34NanoGFX.h"
 
+const unsigned long PULSE_MICROSECONDS = 200;
+const unsigned long DELAY_MICROSECONDS = 50;
+
 #define COMMAND_FLAG 0x80
 
 enum class GfxCommand {
@@ -15,6 +18,7 @@ enum class GfxCommand {
     kRect = 7 | COMMAND_FLAG,
     kFillRect = 8 | COMMAND_FLAG,
     kBitmap = 9 | COMMAND_FLAG,
+    kSetDelays = 10 | COMMAND_FLAG,
 };
 
 class CommandProcessor {
@@ -40,6 +44,12 @@ public:
         awaiting_bytes = 0;
         offset = 0;
         color = 1;
+        pulse_microseconds = PULSE_MICROSECONDS;
+        delay_microseconds = DELAY_MICROSECONDS;
     }
     void processByte(uint8_t next_byte);
+    long pulse_microseconds;
+    long delay_microseconds;
+
+    void simulateCommand(GfxCommand command, int byte_count, ...);
 };

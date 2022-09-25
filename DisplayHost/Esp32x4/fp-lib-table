@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "DC-DC-StepDown")(type "KiCad")(uri "${KIPRJMOD}/Libraries/DC-DC-StepDown.pretty")(options "")(descr ""))
+  (lib (name "ESP32-DEVKITC-32D")(type "KiCad")(uri "${KIPRJMOD}/Libraries/ESP32-DEVKITC-32D.pretty")(options "")(descr ""))
+)

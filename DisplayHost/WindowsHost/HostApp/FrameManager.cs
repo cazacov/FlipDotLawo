@@ -1,41 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HostApp
 {
     internal class FrameManager
     {
-        public Frame LoadFrame(string fileName, int width, int height)
+        public Frame LoadFrame(string fileName, Size displaySize)
         {
-            var result = new Frame(width, height);
+            var result = new Frame(displaySize.Width, displaySize.Height);
 
             Image image = new Bitmap(fileName);
 
-            Bitmap target = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            Bitmap target = new Bitmap(displaySize.Width, displaySize.Height, PixelFormat.Format24bppRgb);
 
-            var scaleX = (double)image.Width / width;
-            var scaleY = (double)image.Height / height;
+            var scaleX = (double)image.Width / displaySize.Width;
+            var scaleY = (double)image.Height / displaySize.Height;
 
             int dx, dy;
             int sx, sy;
 
             if (scaleX > scaleY)
             {
-                sx = width;
+                sx = displaySize.Width;
                 sy = (int)(image.Height / scaleX);
                 dx = 0;
-                dy = (height - sy) / 2;
+                dy = (displaySize.Height - sy) / 2;
             }
             else
             {
                 sx = (int)(image.Width / scaleY);
-                sy = height;
-                dx =  (width-sx) / 2; ;
+                sy = displaySize.Height;
+                dx =  (displaySize.Width - sx) / 2; ;
                 dy = 0;
             }
 
@@ -48,9 +43,9 @@ namespace HostApp
             );
             image.Dispose();
             
-            for (var y = 0; y < height; y++)
+            for (var y = 0; y < displaySize.Height; y++)
             {
-                for (var x = 0; x < width; x++)
+                for (var x = 0; x < displaySize.Width; x++)
                 {
                     var color = target.GetPixel(x, y);
                     result.Pixels[y, x] = color.GetBrightness() > 0.5;

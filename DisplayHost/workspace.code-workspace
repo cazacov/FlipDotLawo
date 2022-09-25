@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "I2CDisplayHost"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp"
+		}
+	}
+}

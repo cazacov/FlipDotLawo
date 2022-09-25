@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name "Espressif")(type "KiCad")(uri "${KIPRJMOD}/Libraries/Espressif.kicad_sym")(options "")(descr ""))
+  (lib (name "ESP32-DEVKITC-32D")(type "Legacy")(uri "${KIPRJMOD}/Libraries/ESP32-DEVKITC-32D/ESP32-DEVKITC-32D.lib")(options "")(descr ""))
+  (lib (name "yaaj_dcdc_stepdown_lm2596")(type "Legacy")(uri "${KIPRJMOD}/Libraries/DC-DC-StepDown/yaaj_dcdc_stepdown_lm2596.lib")(options "")(descr ""))
+  (lib (name "MyLibrary")(type "KiCad")(uri "${KIPRJMOD}/Libraries/MyLibrary.kicad_sym")(options "")(descr ""))
+)

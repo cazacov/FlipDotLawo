@@ -5,8 +5,7 @@ namespace HostApp
     public partial class MainForm : Form
     {
         private FrameManager frameManager;
-        private int displayWidth;
-        private int displayHeight;
+        private Size displaySize;
         private Frame currentFrame;
         private FrameRenderer frameRenderer;
         private bool isConnected;
@@ -42,6 +41,10 @@ namespace HostApp
             player.PlayFinished += (o, args) =>
             {
                 this.isPlaying = false;
+                if (cbExport.Checked)
+                {
+                    frameRenderer.StopCode();
+                }
                 ShowFinishedSafe();
             };
         }
@@ -72,7 +75,24 @@ namespace HostApp
             {
                 lbFrame.Text = $"Frame: {frameNo}";
                 DisplayFrame(frame);
-                Application.DoEvents();
+                if (isConnected && frameNo % 10 == 0) {
+                    if (frame.Width == 28)
+                    {
+                        busPirateClient.SendBitmap(frame);
+                    }
+                    else
+                    {
+                        busPirateClient.SendBitmapStacked(frame);
+                    }
+                }
+
+                if (cbExport.Checked)
+                {
+                    if (frameNo % Int32.Parse(txtFrameRate.Text) == 0)
+                    {
+                        frameRenderer.AddCode(frame, frameNo);
+                    }
+                }
             }
         }
 
@@ -81,16 +101,13 @@ namespace HostApp
             switch (cbSize.SelectedIndex)
             {
                 case 0:
-                    displayWidth = 28;
-                    displayHeight = 19;
+                    displaySize = new Size(28, 19);
                     break;
                 case 1:
-                    displayWidth = 38;
-                    displayHeight = 28;
+                    displaySize = new Size(38, 28);
                     break;
                 case 2:
-                    displayWidth = 56;
-                    displayHeight = 38;
+                    displaySize = new Size(56, 38);
                     break;
 
             }
@@ -153,17 +170,24 @@ namespace HostApp
 
         private void btLoad_Click(object sender, EventArgs e)
         {
-            string fileName = @"E:\Git\FlipDotLawo\DisplayHost\Esp32\BadApple\Frames-30fps\frame00256.png";
+            string fileName = @"E:\Git\FlipDotLawo\DisplayHost\input\BadApple\Frames-30fps\frame00256.png";
             LoadFrame(fileName);
         }
 
         private void LoadFrame(string fileName)
         {
-            this.currentFrame = frameManager.LoadFrame(fileName, displayWidth, displayHeight);
+            this.currentFrame = frameManager.LoadFrame(fileName, displaySize);
             DisplayFrame(this.currentFrame);
             if (isConnected)
             {
-                //busPirateClient.SendBitmap(this.currentFrame);
+                if (this.currentFrame.Width == 28)
+                {
+                    busPirateClient.SendBitmap(this.currentFrame);
+                }
+                else
+                {
+                    busPirateClient.SendBitmapStacked(this.currentFrame);
+                }
             }
         }
 
@@ -188,12 +212,29 @@ namespace HostApp
             {
                 btPlay.Text = "Stop";
                 isPlaying = true;
-                player.Play(tbPath.Text, displayWidth, displayHeight);
+                Application.DoEvents();
+                if (cbExport.Checked)
+                {
+                    frameRenderer.StartCode(IoHelper.ToAbsolutePath(txtExportPath.Text), displaySize);
+                }
+                player.Play(IoHelper.ToAbsolutePath(tbPath.Text), displaySize, isConnected);
             }
             else
             {
+                btPlay.Text = "Stopping...";
                 player.Stop();
+                Application.DoEvents();
             }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tbPath_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

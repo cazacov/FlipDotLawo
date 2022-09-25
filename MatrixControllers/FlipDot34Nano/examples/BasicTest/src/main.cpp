@@ -25,9 +25,10 @@ void loop() {
       display.startWrite();
       display.drawPixel(x, y, color);
       display.endWrite();
-      delay(5);
+//      delay(5);
     }
   }
+/*  
   delay(3);
   uint8_t lineLen = display.width() - display.height() + 1;
   for (int y = 0; y < display.height(); y++) {
@@ -41,7 +42,8 @@ void loop() {
     }
     display.endWrite();
   }
+*/
 
-  delay(30000);
+  delay(3000);
   color = 1 - color;
 }

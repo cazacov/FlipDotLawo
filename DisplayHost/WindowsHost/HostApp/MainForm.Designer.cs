@@ -39,12 +39,16 @@
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.pbFrame = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btLoad = new System.Windows.Forms.Button();
-            this.tbPath = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.tFrames = new System.Windows.Forms.Timer(this.components);
-            this.btPlay = new System.Windows.Forms.Button();
+            this.txtFrameRate = new System.Windows.Forms.TextBox();
+            this.cbExport = new System.Windows.Forms.CheckBox();
+            this.txtExportPath = new System.Windows.Forms.TextBox();
+            this.lblExport = new System.Windows.Forms.Label();
             this.lbFrame = new System.Windows.Forms.Label();
+            this.btPlay = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tbPath = new System.Windows.Forms.TextBox();
+            this.btLoad = new System.Windows.Forms.Button();
+            this.tFrames = new System.Windows.Forms.Timer(this.components);
             this.pblLog.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbFrame)).BeginInit();
             this.panel1.SuspendLayout();
@@ -153,6 +157,10 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.txtFrameRate);
+            this.panel1.Controls.Add(this.cbExport);
+            this.panel1.Controls.Add(this.txtExportPath);
+            this.panel1.Controls.Add(this.lblExport);
             this.panel1.Controls.Add(this.lbFrame);
             this.panel1.Controls.Add(this.btPlay);
             this.panel1.Controls.Add(this.label3);
@@ -167,36 +175,50 @@
             this.panel1.Size = new System.Drawing.Size(1814, 651);
             this.panel1.TabIndex = 9;
             // 
-            // btLoad
+            // txtFrameRate
             // 
-            this.btLoad.Location = new System.Drawing.Point(759, 582);
-            this.btLoad.Name = "btLoad";
-            this.btLoad.Size = new System.Drawing.Size(150, 46);
-            this.btLoad.TabIndex = 9;
-            this.btLoad.Text = "Load";
-            this.btLoad.UseVisualStyleBackColor = true;
-            this.btLoad.Click += new System.EventHandler(this.btLoad_Click);
+            this.txtFrameRate.Location = new System.Drawing.Point(974, 361);
+            this.txtFrameRate.Name = "txtFrameRate";
+            this.txtFrameRate.Size = new System.Drawing.Size(123, 39);
+            this.txtFrameRate.TabIndex = 17;
+            this.txtFrameRate.Text = "15";
             // 
-            // tbPath
+            // cbExport
             // 
-            this.tbPath.Location = new System.Drawing.Point(926, 82);
-            this.tbPath.Name = "tbPath";
-            this.tbPath.Size = new System.Drawing.Size(837, 39);
-            this.tbPath.TabIndex = 10;
-            this.tbPath.Text = "E:\\Git\\FlipDotLawo\\DisplayHost\\Esp32\\BadApple\\Frames-30fps";
+            this.cbExport.AutoSize = true;
+            this.cbExport.Location = new System.Drawing.Point(780, 361);
+            this.cbExport.Name = "cbExport";
+            this.cbExport.Size = new System.Drawing.Size(178, 36);
+            this.cbExport.TabIndex = 16;
+            this.cbExport.Text = "Export every";
+            this.cbExport.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // txtExportPath
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(768, 87);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(145, 32);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "Images path";
+            this.txtExportPath.Location = new System.Drawing.Point(926, 293);
+            this.txtExportPath.Name = "txtExportPath";
+            this.txtExportPath.Size = new System.Drawing.Size(837, 39);
+            this.txtExportPath.TabIndex = 15;
+            this.txtExportPath.Text = "..\\..\\..\\..\\..\\generated\\";
+            this.txtExportPath.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
-            // tFrames
+            // lblExport
             // 
-            this.tFrames.Interval = 33;
+            this.lblExport.AutoSize = true;
+            this.lblExport.Location = new System.Drawing.Point(779, 296);
+            this.lblExport.Name = "lblExport";
+            this.lblExport.Size = new System.Drawing.Size(136, 32);
+            this.lblExport.TabIndex = 14;
+            this.lblExport.Text = "Export path";
+            // 
+            // lbFrame
+            // 
+            this.lbFrame.AutoSize = true;
+            this.lbFrame.Location = new System.Drawing.Point(974, 185);
+            this.lbFrame.Name = "lbFrame";
+            this.lbFrame.Size = new System.Drawing.Size(134, 32);
+            this.lbFrame.TabIndex = 13;
+            this.lbFrame.Text = "Frame: XXX";
             // 
             // btPlay
             // 
@@ -208,14 +230,37 @@
             this.btPlay.UseVisualStyleBackColor = true;
             this.btPlay.Click += new System.EventHandler(this.btPlay_Click);
             // 
-            // lbFrame
+            // label3
             // 
-            this.lbFrame.AutoSize = true;
-            this.lbFrame.Location = new System.Drawing.Point(974, 185);
-            this.lbFrame.Name = "lbFrame";
-            this.lbFrame.Size = new System.Drawing.Size(134, 32);
-            this.lbFrame.TabIndex = 13;
-            this.lbFrame.Text = "Frame: XXX";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(768, 87);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(145, 32);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Images path";
+            // 
+            // tbPath
+            // 
+            this.tbPath.Location = new System.Drawing.Point(926, 82);
+            this.tbPath.Name = "tbPath";
+            this.tbPath.Size = new System.Drawing.Size(837, 39);
+            this.tbPath.TabIndex = 10;
+            this.tbPath.Text = "..\\..\\..\\..\\..\\input\\BadApple\\Frames-30fps\\";
+            this.tbPath.TextChanged += new System.EventHandler(this.tbPath_TextChanged);
+            // 
+            // btLoad
+            // 
+            this.btLoad.Location = new System.Drawing.Point(759, 582);
+            this.btLoad.Name = "btLoad";
+            this.btLoad.Size = new System.Drawing.Size(150, 46);
+            this.btLoad.TabIndex = 9;
+            this.btLoad.Text = "Load";
+            this.btLoad.UseVisualStyleBackColor = true;
+            this.btLoad.Click += new System.EventHandler(this.btLoad_Click);
+            // 
+            // tFrames
+            // 
+            this.tFrames.Interval = 33;
             // 
             // MainForm
             // 
@@ -255,5 +300,9 @@
         private Label lbFrame;
         private Button btPlay;
         private System.Windows.Forms.Timer tFrames;
+        private TextBox txtExportPath;
+        private Label lblExport;
+        private TextBox txtFrameRate;
+        private CheckBox cbExport;
     }
 }

@@ -13,6 +13,9 @@
 		{
 			"name": "MatrixControllerI2C",
 			"path": "examples\\MatrixControllerI2C"
+		},
+		{
+			"path": "..\\..\\DisplayHost\\I2CDisplayHost"
 		}
 	],
 	"settings": {
@@ -34,7 +37,11 @@
 			"list": "cpp",
 			"xhash": "cpp",
 			"xiosbase": "cpp",
-			"xtree": "cpp"
+			"xtree": "cpp",
+			"chrono": "cpp",
+			"ostream": "cpp",
+			"*.tcc": "cpp",
+			"ratio": "cpp"
 		}
 	}
 }

@@ -10,8 +10,9 @@ namespace HostApp
         private int frameNr = 0;
         private bool stopFlag;
         private string path;
-        private int displayWidth;
-        private int displayHeight;
+        private bool isProcessing = false;
+        private Size displaySize;
+        private bool useTimer;
 
         public Player(FrameManager frameManager, FrameRenderer frameRenderer)
         {
@@ -24,38 +25,50 @@ namespace HostApp
 
         private void LoadNextFrame(object? sender, EventArgs e)
         {
-            this.timer.Stop();
+            if (isProcessing)
+            {
+                return;
+            }
+
+            isProcessing = true;
             frameNr++;
 
-            var fileName = Path.Combine(path, $"frame{frameNr:00000}.png");
-            if (File.Exists(fileName))
-            {
-                var frame = frameManager.LoadFrame(fileName, displayWidth, displayHeight);
-                OnFrameLoaded(new FrameEventArgs() { FrameNo = frameNr, Frame = frame});
-            }
-            else
-            {
-                stopFlag = true;
-            }
             if (!stopFlag)
             {
-                this.timer.Start();
+                var fileName = Path.Combine(path, $"frame{frameNr:00000}.png");
+                if (File.Exists(fileName))
+                {
+                    var frame = frameManager.LoadFrame(fileName, displaySize);
+                    OnFrameLoaded(new FrameEventArgs() { FrameNo = frameNr, Frame = frame });
+                }
+                else
+                {
+                    stopFlag = true;
+                }
             }
-            else
+
+            if (stopFlag)
             {
+                this.timer.Stop();
                 OnPlayFinished(EventArgs.Empty);
             }
+            isProcessing = false;
         }
 
-        public void Play(string path, int displayWidth, int displayHeight)
+        public void Play(string path, Size displaySize, bool useTimer)
         {
+            this.useTimer = useTimer;
             this.stopFlag = false;
             this.timer.Interval = 33;
             frameNr = 0;
             this.path = path;
-            this.displayWidth = displayWidth;
-            this.displayHeight = displayHeight;
+            this.displaySize = displaySize;
+            if (!useTimer)
+            {
+                this.timer.Interval = 1;
+            }
             this.timer.Start();
+            isProcessing = false;
         }
 
         public event EventHandler<FrameEventArgs> FrameLoaded;

@@ -2,9 +2,13 @@
 
 Controller for the flip-dot display with 34-pin connector. For example produced by Lawo-Luminator-Europa Mark IV Industries GmbH.
 
+Version 28x19
 ![Prototype](./_img/front.jpg)
-
 ![Prototype](./_img/back.jpg)
+
+Version 28x24 with LED lights
+![Prototype](./_img/28x24_front.jpg)
+![Prototype](./_img/28x24_back.jpg)
 
 ## Connector Pinout
 | Pin |  Function | Pin |  Function |

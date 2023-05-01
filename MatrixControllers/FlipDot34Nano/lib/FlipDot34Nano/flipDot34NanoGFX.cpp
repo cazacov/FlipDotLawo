@@ -11,7 +11,7 @@
 #define addr1pin A1
 #define addr2pin A2
 
-#define pulseLengthMicroseconds 200L
+#define pulseLengthMicroseconds 250L
 #define pauseLengthMicroseconds 50L
 
 FlipDot34NanoGFX::FlipDot34NanoGFX(int matrix_width, int matrix_height, int matrix_columns, StackMode stack_mode)
@@ -63,11 +63,11 @@ void FlipDot34NanoGFX::startPulse(int x, int y, bool state)
     if ((x < 0) || (y < 0) || (x >= WIDTH) || (y >= HEIGHT))
         return;
 
-    uint8_t matrix_column = 0;
+    uint8_t matrix_column = 7;
     while (x >= matrix_width_)
     {
         x -= matrix_width_;
-        matrix_column++;
+        matrix_column--;
     }
     if (is_stacked_)
     {
@@ -326,6 +326,7 @@ void FlipDot34NanoGFX::setBitmap(const uint8_t *bytes, size_t count) {
 char bb[100];
 
 bool FlipDot34NanoGFX::updateNext() {
+
     bool result = false;
 
     uint8_t screen_byte = *next_screen_ptr;
@@ -333,7 +334,6 @@ bool FlipDot34NanoGFX::updateNext() {
 
 //    sprintf(bb, "cb: %d, tb: %d", (int)screen_byte, (int)target_byte);
 //    Serial.println(bb);
-
     if ((screen_byte ^ target_byte) & next_mask) {
         startPulse(next_x, next_y, target_byte & next_mask);
         screen_byte ^= next_mask;  // flip bit
@@ -342,6 +342,7 @@ bool FlipDot34NanoGFX::updateNext() {
     }
     next_mask <<= 1;
     next_bit_nr++;
+
     if (next_bit_nr == BITS_IN_BYTE) {
         next_mask = 0x01;
         next_bit_nr = 0;

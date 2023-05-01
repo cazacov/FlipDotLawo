@@ -24,6 +24,9 @@ public:
     void endWrite(void);
 // GFX Helper    
     void printCentered(const char *buf, uint16_t x, uint16_t y);
+// Expose useful variables
+    uint16_t frameBufferSize;
+    uint16_t frameBufferWidth;
 protected:
     int matrix_width_;
     int matrix_height_;
@@ -32,8 +35,6 @@ protected:
     int matrix_columns_;
     bool is_stacked_;
     uint8_t* volatile frameBuffer;
-    uint16_t frameBufferSize;
-    uint16_t frameBufferWidth;
     uint8_t next_x;
     uint8_t next_y;
     uint8_t next_mask;
